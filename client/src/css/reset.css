@@ -128,6 +128,12 @@ table {
     border-spacing: 0;
 }
 
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: "Noto Sans TC", Arial, Helvetica, sans-serif;
 }
