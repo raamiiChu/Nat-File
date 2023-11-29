@@ -16,6 +16,8 @@ import {
     faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 
+import Swal from "sweetalert2";
+
 import fox from "../images/fox.jpg";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -50,7 +52,6 @@ const Edit = () => {
     };
 
     const [layouts, setLayouts] = useState(() => {
-        loadFromDatabase();
         const savedLayouts = JSON.parse(localStorage.getItem("layouts"));
         if (savedLayouts) {
             return savedLayouts;
@@ -106,7 +107,13 @@ const Edit = () => {
         });
 
         if (res.status === 200) {
-            alert("Save Successfully");
+            Swal.fire({
+                position: "middle",
+                icon: "success",
+                title: "Your work has been saved",
+                showConfirmButton: false,
+                timer: 1000,
+            });
         }
     };
 
@@ -184,7 +191,7 @@ const Edit = () => {
                                     <div className="w-1/2">
                                         <img
                                             src={file}
-                                            alt="fox"
+                                            alt={title}
                                             className="block object-cover"
                                         />
                                     </div>
@@ -256,14 +263,14 @@ const Edit = () => {
                 }}
             >
                 <div
-                    className="w-4/12 mx-auto py-4 bg-white text-center"
+                    className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 bg-white text-center"
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
                 >
                     <h2 className="text-xl py-3">Upload Your Image</h2>
                     <form
-                        className="w-8/12 mx-auto flex flex-col justify-center gap-y-2"
+                        className="w-11/12 lg:w-9/12 mx-auto flex flex-col justify-center gap-y-2"
                         onSubmit={(e) => {
                             addImage(e);
                         }}
