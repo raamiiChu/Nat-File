@@ -28,60 +28,52 @@ const Edit = () => {
         { name: "Page B", uv: 800, pv: 2000, amt: 5000 },
     ];
 
+    // check if upload btn is clicked
+    const [isUploading, setIsUploading] = useState(false);
+
+    // form data
     const [title, setTitle] = useState("");
     const [species, setSpecies] = useState("");
     const [file, setFile] = useState("");
     const [time, setTime] = useState("");
 
-    // store div width and height
+    // layouts for <ResponsiveGridLayout/>
+    const [layouts, setLayouts] = useState(() => {
+        // try to get layouts from local storage
+        const savedLayouts = JSON.parse(localStorage.getItem("layouts"));
+
+        return (
+            savedLayouts || {
+                lg: [
+                    { i: "1", x: 0, y: 0, w: 1, h: 2 },
+                    { i: "2", x: 1, y: 0, w: 3, h: 2 },
+                    { i: "3", x: 4, y: 0, w: 1, h: 2 },
+                ],
+            }
+        );
+    });
+
+    // user's upload images
+    const [images, setImages] = useState(() => {
+        // try to get images from local storage
+        const savedImages = JSON.parse(localStorage.getItem("images"));
+        return savedImages || [];
+    });
+
+    // store div's width and height ( to make chart )
     const divRef = useRef(null);
     const [dimensions, setDimensions] = useState({
         width: 0,
         height: 0,
     });
 
-    const loadFromDatabase = async () => {
-        const res = await axios.get("http://localhost:3001/portfolio/load");
-        const portfolio = res.data.Portfolios;
-
-        if (portfolio.length !== 0) {
-            const { images, layouts } = portfolio[0];
-            localStorage.setItem("images", JSON.stringify(images));
-            localStorage.setItem("layouts", JSON.stringify(layouts));
-        }
-    };
-
-    const [layouts, setLayouts] = useState(() => {
-        const savedLayouts = JSON.parse(localStorage.getItem("layouts"));
-        if (savedLayouts) {
-            return savedLayouts;
-        } else {
-            return {
-                lg: [
-                    { i: "1", x: 0, y: 0, w: 1, h: 2 },
-                    { i: "2", x: 1, y: 0, w: 3, h: 2 },
-                    { i: "3", x: 4, y: 0, w: 1, h: 2 },
-                ],
-            };
-        }
-    });
-
-    const [images, setImages] = useState(() => {
-        const savedImages = JSON.parse(localStorage.getItem("images"));
-        if (savedImages) {
-            return savedImages;
-        } else {
-            return [];
-        }
-    });
-
+    // trigger on layout change
     const saveCurrLayout = (layouts) => {
         setLayouts(layouts);
         localStorage.setItem("layouts", JSON.stringify(layouts));
     };
 
-    const [isUploading, setIsUploading] = useState(false);
-
+    // trigger after form been submitted
     const addImage = (e) => {
         // check the form
         if (!title || !species || !file) {
@@ -99,6 +91,18 @@ const Edit = () => {
         });
     };
 
+    // trigger by delete btn
+    const deleteImage = (e, id) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setImages(
+            images.filter((image) => {
+                return image.id !== id;
+            })
+        );
+    };
+
+    // trigger by save btn
     const saveToDatabase = async (e) => {
         const res = await axios.post("http://localhost:3001/portfolio/save", {
             email: "jane23@fake.com",
@@ -114,6 +118,20 @@ const Edit = () => {
                 showConfirmButton: false,
                 timer: 1000,
             });
+        }
+    };
+
+    // set layouts & images from db to local storage ( if exist )
+    const loadFromDatabase = async () => {
+        const res = await axios.get("http://localhost:3001/portfolio/load");
+        const portfolio = res.data.Portfolios;
+
+        if (portfolio.length !== 0) {
+            const { images, layouts } = portfolio[0];
+            localStorage.setItem("images", JSON.stringify(images));
+            localStorage.setItem("layouts", JSON.stringify(layouts));
+            setImages(images);
+            setLayouts(layouts);
         }
     };
 
@@ -204,13 +222,7 @@ const Edit = () => {
                                     <button
                                         className="absolute z-10 -right-5 -top-5 w-8 h-8 border border-solid border-black"
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            e.preventDefault();
-                                            setImages(
-                                                images.filter((image) => {
-                                                    return image.id !== id;
-                                                })
-                                            );
+                                            deleteImage(e, id);
                                         }}
                                     >
                                         X
