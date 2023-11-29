@@ -11,10 +11,20 @@ route.post("/save", async (req, res) => {
 
     const foundUser = await User.findOne({ where: { email } });
 
-    const newPortfolio = await Portfolio.create({ images, layouts });
-    await newPortfolio.setUser(foundUser);
+    let rawData = await User.findOne({
+        where: { id: 1 },
+        attributes: ["name", "email"],
+        include: [{ model: Portfolio, attributes: ["images", "layouts"] }],
+    });
 
-    res.status(200).send("ok");
+    if (rawData.Portfolios.length === 0) {
+        const newPortfolio = await Portfolio.create({ images, layouts });
+        await newPortfolio.setUser(foundUser);
+        return res.status(200).send("create");
+    } else {
+        await Portfolio.update({ images, layouts }, { where: { id: 1 } });
+        return res.status(200).send("update");
+    }
 });
 
 route.get("/load", async (req, res) => {
