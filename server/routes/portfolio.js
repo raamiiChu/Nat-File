@@ -14,7 +14,7 @@ route.post("/save", async (req, res) => {
     const newPortfolio = await Portfolio.create({ images, layouts });
     await newPortfolio.setUser(foundUser);
 
-    res.send("ok");
+    res.status(200).send("ok");
 });
 
 route.get("/load", async (req, res) => {
