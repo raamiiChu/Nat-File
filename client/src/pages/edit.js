@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "../css/react-grid-layout.css";
@@ -30,13 +31,26 @@ const Edit = () => {
     const [file, setFile] = useState("");
     const [time, setTime] = useState("");
 
+    // store div width and height
     const divRef = useRef(null);
     const [dimensions, setDimensions] = useState({
         width: 0,
         height: 0,
     });
 
+    const loadFromDatabase = async () => {
+        const res = await axios.get("http://localhost:3001/portfolio/load");
+        const portfolio = res.data.Portfolios;
+
+        if (portfolio.length !== 0) {
+            const { images, layouts } = portfolio[0];
+            localStorage.setItem("images", JSON.stringify(images));
+            localStorage.setItem("layouts", JSON.stringify(layouts));
+        }
+    };
+
     const [layouts, setLayouts] = useState(() => {
+        loadFromDatabase();
         const savedLayouts = JSON.parse(localStorage.getItem("layouts"));
         if (savedLayouts) {
             return savedLayouts;
@@ -59,6 +73,7 @@ const Edit = () => {
             return [];
         }
     });
+
     const saveCurrLayout = (layouts) => {
         setLayouts(layouts);
         localStorage.setItem("layouts", JSON.stringify(layouts));
@@ -83,6 +98,18 @@ const Edit = () => {
         });
     };
 
+    const saveToDatabase = async (e) => {
+        const res = await axios.post("http://localhost:3001/portfolio/save", {
+            email: "jane23@fake.com",
+            layouts,
+            images,
+        });
+
+        if (res.status === 200) {
+            alert("Save Successfully");
+        }
+    };
+
     useEffect(() => {
         if (divRef.current?.offsetHeight && divRef.current?.offsetWidth) {
             setDimensions({
@@ -90,6 +117,8 @@ const Edit = () => {
                 height: divRef.current.offsetHeight,
             });
         }
+
+        loadFromDatabase();
     }, []);
 
     useEffect(() => {
@@ -203,6 +232,9 @@ const Edit = () => {
                     <button
                         title="Save"
                         className="w-12 h-12 bg-black rounded-full scale-75 sm:scale-90 lg:scale-100 hover:opacity-75"
+                        onClick={(e) => {
+                            saveToDatabase(e);
+                        }}
                     >
                         <FontAwesomeIcon
                             icon={faFloppyDisk}
