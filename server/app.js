@@ -5,7 +5,7 @@ import cors from "cors";
 
 import sequelize from "./db.js";
 
-import { userRoute, portfolioRoute } from "./routes/index.js";
+import { userRoute, portfolioRoute, imagesRoute } from "./routes/index.js";
 
 const app = express();
 const port = 3001;
@@ -22,6 +22,7 @@ app.use(cors(corsOptions));
 
 app.use("/user", userRoute);
 app.use("/portfolio", portfolioRoute);
+app.use("/images", imagesRoute);
 
 app.get("/", (req, res) => {
     res.send("Home Page");
