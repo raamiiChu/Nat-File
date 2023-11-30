@@ -23,6 +23,8 @@ import fox from "../images/fox.jpg";
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const Edit = () => {
+    const backendUrl = "http://localhost:3001";
+
     const data = [
         { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
         { name: "Page B", uv: 800, pv: 2000, amt: 5000 },
@@ -74,7 +76,7 @@ const Edit = () => {
     };
 
     // trigger after form been submitted
-    const addImage = (e) => {
+    const addImage = async (e) => {
         // check the form
         if (!title || !species || !file) {
             return;
@@ -82,19 +84,42 @@ const Edit = () => {
 
         e.preventDefault();
 
-        // reset form input
-        e.target.reset();
+        const formData = new FormData();
+        formData.append("image", file);
 
-        setIsUploading(false);
-        setImages((prev) => {
-            return [...prev, { id: uuidv4(), title, species, time, file }];
-        });
+        try {
+            const { data: s3Key } = await axios.post(
+                `${backendUrl}/images/upload`,
+                formData,
+                {
+                    Headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+
+            // reset form input
+            e.target.reset();
+
+            setIsUploading(false);
+            setImages((prev) => {
+                return [...prev, { id: uuidv4(), title, species, time, s3Key }];
+            });
+        } catch (error) {
+            console.log(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Please upload an image, and the size should less than 10MB!",
+            });
+        }
     };
 
     // trigger by delete btn
-    const deleteImage = (e, id) => {
+    const deleteImage = async (e, id, s3Key) => {
         e.stopPropagation();
         e.preventDefault();
+
+        await axios.delete(`${backendUrl}/images/${s3Key}`);
+
         setImages(
             images.filter((image) => {
                 return image.id !== id;
@@ -104,7 +129,7 @@ const Edit = () => {
 
     // trigger by save btn
     const saveToDatabase = async (e) => {
-        const res = await axios.post("http://localhost:3001/portfolio/save", {
+        const res = await axios.post(`${backendUrl}/portfolio/save`, {
             email: "jane23@fake.com",
             layouts,
             images,
@@ -123,7 +148,7 @@ const Edit = () => {
 
     // set layouts & images from db to local storage ( if exist )
     const loadFromDatabase = async () => {
-        const res = await axios.get("http://localhost:3001/portfolio/load");
+        const res = await axios.get(`${backendUrl}/portfolio/load`);
         const portfolio = res.data.Portfolios;
 
         if (portfolio.length !== 0) {
@@ -199,7 +224,7 @@ const Edit = () => {
                             3
                         </div>
                         {images.map((image) => {
-                            const { id, title, species, time, file } = image;
+                            const { id, title, species, time, s3Key } = image;
 
                             return (
                                 <div
@@ -208,7 +233,7 @@ const Edit = () => {
                                 >
                                     <div className="w-1/2">
                                         <img
-                                            src={file}
+                                            src={`${backendUrl}/images/${s3Key}`}
                                             alt={title}
                                             className="block object-cover"
                                         />
@@ -222,7 +247,7 @@ const Edit = () => {
                                     <button
                                         className="absolute z-10 -right-5 -top-5 w-8 h-8 border border-solid border-black"
                                         onClick={(e) => {
-                                            deleteImage(e, id);
+                                            deleteImage(e, id, s3Key);
                                         }}
                                     >
                                         X
@@ -282,6 +307,7 @@ const Edit = () => {
                 >
                     <h2 className="text-xl py-3">Upload Your Image</h2>
                     <form
+                        action="POST"
                         className="w-11/12 lg:w-9/12 mx-auto flex flex-col justify-center gap-y-2"
                         onSubmit={(e) => {
                             addImage(e);
@@ -325,11 +351,10 @@ const Edit = () => {
                                 required
                                 onChange={(e) => {
                                     setTime(
-                                        e.target.files[0].lastModifiedDate.toDateString()
+                                        e.target.files[0]?.lastModifiedDate.toDateString()
                                     );
-                                    setFile(
-                                        URL.createObjectURL(e.target.files[0])
-                                    );
+
+                                    setFile(e.target.files[0]);
                                 }}
                             />
                         </div>
