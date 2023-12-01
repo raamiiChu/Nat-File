@@ -252,7 +252,7 @@ const Edit = () => {
                             return (
                                 <div
                                     key={item}
-                                    className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl cursor-grab active:cursor-grabbing"
+                                    className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
                                 >
                                     <div className="w-1/2">
                                         <img
@@ -299,7 +299,7 @@ const Edit = () => {
                             return (
                                 <div
                                     key={id}
-                                    className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl cursor-grab active:cursor-grabbing"
+                                    className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
                                 >
                                     <div className="w-1/2">
                                         <img
