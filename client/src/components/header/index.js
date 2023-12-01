@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+
+import { FaBars } from "react-icons/fa";
+
 const Header = () => {
     const [showMenu, setShowMenu] = useState(false);
     const navLinks = [
@@ -42,12 +43,12 @@ const Header = () => {
 
             {/* mobile toggle */}
             <button
-                className="block sm:hidden col-span-3 m-auto hover:opacity-75"
+                className="block sm:hidden col-span-3 m-auto p-5 hover:opacity-75"
                 onClick={() => {
                     setShowMenu(!showMenu);
                 }}
             >
-                <FontAwesomeIcon className="p-5" icon={faBars} size="xl" />
+                <FaBars className="scale-150" />
             </button>
 
             {/* mobile links */}
