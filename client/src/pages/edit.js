@@ -1,37 +1,48 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "../css/react-grid-layout.css";
 
-import { Chart } from "react-google-charts";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faPlus,
-    faFloppyDisk,
-    faArrowRight,
-    faArrowLeft,
-} from "@fortawesome/free-solid-svg-icons";
+import { LuRectangleVertical, LuRectangleHorizontal } from "react-icons/lu";
+import { IoSquareOutline } from "react-icons/io5";
+import { GoSquare } from "react-icons/go";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { FaPlus, FaSave } from "react-icons/fa";
 
 import Swal from "sweetalert2";
 
 import fox from "../images/fox.jpg";
 
+import { ChartContainer } from "../components/edit";
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
+const scaleBtns = [
+    { icon: <GoSquare />, w: 1, h: 1 },
+    { icon: <LuRectangleHorizontal />, w: 2, h: 1 },
+    { icon: <LuRectangleVertical />, w: 1, h: 2 },
+    { icon: <IoSquareOutline />, w: 2, h: 2 },
+];
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
 
 const Edit = () => {
     const backendUrl = "http://localhost:3001";
 
-    const data = [
-        { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
-        { name: "Page B", uv: 800, pv: 2000, amt: 5000 },
-    ];
-
     // check if upload btn is clicked
     const [isUploading, setIsUploading] = useState(false);
+    const [isConnectingS3, setIsConnectingS3] = useState(false);
 
     // form data
     const [title, setTitle] = useState("");
@@ -40,9 +51,11 @@ const Edit = () => {
     const [time, setTime] = useState("");
 
     // layouts for <ResponsiveGridLayout/>
+    const [layout, setLayout] = useState([]);
     const [layouts, setLayouts] = useState(() => {
         // try to get layouts from local storage
         const savedLayouts = JSON.parse(localStorage.getItem("layouts"));
+        console.log(savedLayouts);
 
         return (
             savedLayouts || {
@@ -62,13 +75,6 @@ const Edit = () => {
         return savedImages || [];
     });
 
-    // store div's width and height ( to make chart )
-    const divRef = useRef(null);
-    const [dimensions, setDimensions] = useState({
-        width: 0,
-        height: 0,
-    });
-
     // trigger on layout change
     const saveCurrLayout = (layouts) => {
         setLayouts(layouts);
@@ -84,6 +90,8 @@ const Edit = () => {
 
         e.preventDefault();
 
+        setIsConnectingS3(true);
+
         const formData = new FormData();
         formData.append("image", file);
 
@@ -95,6 +103,11 @@ const Edit = () => {
                     Headers: { "Content-Type": "multipart/form-data" },
                 }
             );
+
+            Toast.fire({
+                icon: "success",
+                title: "Your image has been updated",
+            });
 
             // reset form input
             e.target.reset();
@@ -111,6 +124,8 @@ const Edit = () => {
                 text: "Please upload an image, and the size should less than 10MB!",
             });
         }
+
+        setIsConnectingS3(false);
     };
 
     // trigger by delete btn
@@ -135,13 +150,14 @@ const Edit = () => {
             images,
         });
 
+        if (!e) {
+            return;
+        }
+
         if (res.status === 200) {
-            Swal.fire({
-                position: "middle",
+            Toast.fire({
                 icon: "success",
                 title: "Your work has been saved",
-                showConfirmButton: false,
-                timer: 1000,
             });
         }
     };
@@ -161,19 +177,54 @@ const Edit = () => {
     };
 
     useEffect(() => {
-        if (divRef.current?.offsetHeight && divRef.current?.offsetWidth) {
-            setDimensions({
-                width: divRef.current.offsetWidth,
-                height: divRef.current.offsetHeight,
-            });
-        }
-
         loadFromDatabase();
     }, []);
 
     useEffect(() => {
         localStorage.setItem("images", JSON.stringify(images));
+        saveToDatabase();
     }, [images]);
+
+    // trigger by scale btns
+    const scale = (e, key, width = 1, height = 1) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Create a deep copy of the layouts
+        const updatedLayouts = JSON.parse(JSON.stringify(layouts));
+        const layoutIndex = layout.findIndex((item) => item.i === String(key));
+
+        if (layoutIndex !== -1) {
+            // Update the specific layout item's width
+            if (updatedLayouts.lg) {
+                updatedLayouts.lg[layoutIndex] = {
+                    ...updatedLayouts.lg[layoutIndex],
+                    w: width,
+                    h: height,
+                };
+            }
+
+            // Assuming there's an 'md' array in your layouts state, update it as well
+            if (updatedLayouts.md) {
+                updatedLayouts.md[layoutIndex] = {
+                    ...updatedLayouts.md[layoutIndex],
+                    w: width,
+                    h: height,
+                };
+            }
+
+            // Assuming there's an 'sm' array in your layouts state, update it as well
+            if (updatedLayouts.sm) {
+                updatedLayouts.sm[layoutIndex] = {
+                    ...updatedLayouts.sm[layoutIndex],
+                    w: width,
+                    h: height,
+                };
+            }
+
+            saveCurrLayout(updatedLayouts); // Set the updated layouts
+        }
+    };
 
     return (
         <main className="relative bg-[url('../images/edit-bg.jpg')] bg-cover bg-no-repeat bg-top">
@@ -184,58 +235,77 @@ const Edit = () => {
                         layouts={layouts}
                         breakpoints={{
                             lg: 1280,
-                            md: 996,
-                            sm: 640,
-                            xs: 480,
-                            xxs: 0,
+                            md: 640,
+                            sm: 550,
                         }}
-                        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+                        cols={{ lg: 8, md: 4, sm: 2 }}
+                        resizeHandles={[]}
                         onLayoutChange={(layout, layouts) => {
+                            setLayout(layout);
                             saveCurrLayout(layouts);
                         }}
+                        margin={[20, 50]}
+                        containerPadding={[10, 10]}
+                        rowHeight={150}
                     >
-                        <div
-                            key="1"
-                            className="border border-solid border-black cursor-grab active:cursor-grabbing"
-                        >
-                            1
-                        </div>
-                        <div
-                            key="2"
-                            className="border border-solid border-black cursor-grab active:cursor-grabbing"
-                        >
-                            <div className="w-1/2">
-                                <img
-                                    src={fox}
-                                    alt="fox"
-                                    className="block object-cover"
-                                />
-                            </div>
-                            <article>
-                                <h2>Name: Fox</h2>
-                                <p>Time: {new Date().toDateString()}</p>
-                                <h3>Species: Fox</h3>
-                            </article>
-                        </div>
-                        <div
-                            key="3"
-                            className="border border-solid border-black cursor-grab active:cursor-grabbing"
-                        >
-                            3
-                        </div>
+                        {[1, 2, 3].map((item) => {
+                            return (
+                                <div
+                                    key={item}
+                                    className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl cursor-grab active:cursor-grabbing"
+                                >
+                                    <div className="w-1/2">
+                                        <img
+                                            src={fox}
+                                            alt="fox"
+                                            className="block object-cover rounded-xl"
+                                        />
+                                    </div>
+                                    <article>
+                                        <h2>Name: {item}</h2>
+                                        <p>Time: {new Date().toDateString()}</p>
+                                        <h3>Species: Fox</h3>
+                                    </article>
+
+                                    <button
+                                        className="absolute z-10 -left-5 -top-5 w-10 h-10 flex justify-center items-center shadow-2xl rounded-full bg-white text-black opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                                        onClick={null}
+                                    >
+                                        <FaRegTrashAlt />
+                                    </button>
+
+                                    <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-10/12 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
+                                        {scaleBtns.map((scaleBtn) => {
+                                            const { icon, w, h } = scaleBtn;
+
+                                            return (
+                                                <button
+                                                    className="w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg text-white hover:bg-white hover:text-black"
+                                                    onClick={(e) => {
+                                                        scale(e, item, w, h);
+                                                    }}
+                                                >
+                                                    {icon}
+                                                </button>
+                                            );
+                                        })}
+                                    </nav>
+                                </div>
+                            );
+                        })}
                         {images.map((image) => {
                             const { id, title, species, time, s3Key } = image;
 
                             return (
                                 <div
                                     key={id}
-                                    className="relative border border-solid border-black cursor-grab active:cursor-grabbing"
+                                    className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl cursor-grab active:cursor-grabbing"
                                 >
                                     <div className="w-1/2">
                                         <img
                                             src={`${backendUrl}/images/${s3Key}`}
                                             alt={title}
-                                            className="block object-cover"
+                                            className="block object-cover rounded-xl"
                                         />
                                     </div>
                                     <article>
@@ -245,13 +315,30 @@ const Edit = () => {
                                     </article>
 
                                     <button
-                                        className="absolute z-10 -right-5 -top-5 w-8 h-8 border border-solid border-black"
+                                        className="absolute z-10 -left-5 -top-5 w-10 h-10 border border-solid border-black border-opacity-30 rounded-full shadow-2xl bg-white text-black opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
                                         onClick={(e) => {
                                             deleteImage(e, id, s3Key);
                                         }}
                                     >
-                                        X
+                                        <FaRegTrashAlt className="mx-auto" />
                                     </button>
+
+                                    <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-10/12 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
+                                        {scaleBtns.map((scaleBtn) => {
+                                            const { icon, w, h } = scaleBtn;
+
+                                            return (
+                                                <button
+                                                    className="w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg text-white hover:bg-white hover:text-black"
+                                                    onClick={(e) => {
+                                                        scale(e, id, w, h);
+                                                    }}
+                                                >
+                                                    {icon}
+                                                </button>
+                                            );
+                                        })}
+                                    </nav>
                                 </div>
                             );
                         })}
@@ -262,29 +349,21 @@ const Edit = () => {
                 <div className="absolute z-10 bottom-[13%] sm:bottom-[15%] right-[10%] sm:right-[5%] lg:right-[12%] flex gap-x-2 sm:gap-x-4">
                     <button
                         title="Upload Image"
-                        className="w-12 h-12 bg-black rounded-full scale-75 sm:scale-90 lg:scale-100 hover:opacity-75"
+                        className="w-12 h-12 text-white bg-black rounded-full scale-75 sm:scale-90 lg:scale-100 hover:opacity-75"
                         onClick={() => {
                             setIsUploading(true);
                         }}
                     >
-                        <FontAwesomeIcon
-                            icon={faPlus}
-                            style={{ color: "#ffffff" }}
-                            size="xl"
-                        />
+                        <FaPlus className="mx-auto scale-150" />
                     </button>
                     <button
                         title="Save"
-                        className="w-12 h-12 bg-black rounded-full scale-75 sm:scale-90 lg:scale-100 hover:opacity-75"
+                        className="w-12 h-12 text-white bg-black rounded-full scale-75 sm:scale-90 lg:scale-100 hover:opacity-75"
                         onClick={(e) => {
                             saveToDatabase(e);
                         }}
                     >
-                        <FontAwesomeIcon
-                            icon={faFloppyDisk}
-                            style={{ color: "#ffffff" }}
-                            size="xl"
-                        />
+                        <FaSave className="mx-auto scale-150" />
                     </button>
                 </div>
             </section>
@@ -361,7 +440,8 @@ const Edit = () => {
 
                         <button
                             type="submit"
-                            className="px-3 py-1 border border-solid border-black rounded-full"
+                            className={`px-3 py-1 border border-solid border-black rounded-full hover:bg-black hover:text-white disabled:cursor-progress disabled:opacity-20 disabled:bg-black disabled:text-white`}
+                            disabled={isConnectingS3}
                         >
                             Submit
                         </button>
@@ -369,96 +449,7 @@ const Edit = () => {
                 </div>
             </section>
 
-            <section className="pt-10 sm:pt-12 lg:pt-16 bg-black text-white">
-                <div className="grid grid-cols-12 items-center">
-                    <hr className="col-start-2 lg:col-start-3 col-span-3 h-0.5 sm:h-1 bg-primary" />
-                    <h2 className="col-span-4 lg:col-span-2 text-2xl sm:text-3xl lg:text-4xl text-center font-bold text-primary">
-                        Chart
-                    </h2>
-                    <hr className="col-span-3 h-0.5 sm:h-1 bg-primary" />
-                </div>
-
-                <div className="relative group grid grid-cols-12 items-center py-16">
-                    <div className="col-start-2 col-span-10 grid grid-cols-1 lg:grid-cols-2">
-                        <section className="grid grid-cols-12 gap-y-6">
-                            <p className="col-span-full">
-                                Lorem ipsum dolor sit amet consectetur,
-                                adipisicing elit. Eligendi eveniet labore
-                                repellendus perspiciatis ad dignissimos, non
-                                dicta quisquam modi itaque nisi quibusdam quod,
-                            </p>
-
-                            <div
-                                ref={divRef}
-                                className="col-start-2 col-span-10 flex justify-center h-[200px] "
-                            >
-                                <LineChart
-                                    width={dimensions.width}
-                                    height={dimensions.height}
-                                    data={data}
-                                >
-                                    <Line
-                                        type="monotone"
-                                        dataKey="uv"
-                                        stroke="#8884d8"
-                                    />
-                                    <CartesianGrid stroke="#ccc" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                </LineChart>
-                            </div>
-                        </section>
-
-                        <section className="hidden lg:grid grid-cols-12 gap-y-6">
-                            <p className="col-span-full">
-                                Lorem ipsum dolor sit amet consectetur,
-                                adipisicing elit. Eligendi eveniet labore
-                                repellendus perspiciatis ad dignissimos, non
-                                dicta quisquam modi itaque nisi quibusdam quod,
-                            </p>
-
-                            <div className="col-start-2 col-span-10 border border-solid border-white">
-                                <Chart
-                                    chartType="PieChart"
-                                    data={[
-                                        ["Task", "Hours per Day"],
-                                        ["Work", 11],
-                                        ["Eat", 2],
-                                        ["Commute", 2],
-                                        ["Watch TV", 2],
-                                        ["Sleep", 7],
-                                    ]}
-                                    options={{
-                                        title: "My Daily Activities",
-                                    }}
-                                    className=""
-                                />
-                            </div>
-                        </section>
-                    </div>
-
-                    <button
-                        title="Previous"
-                        className="absolute hidden group-hover:block left-4 w-12 h-12 mx-auto bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
-                    >
-                        <FontAwesomeIcon
-                            icon={faArrowLeft}
-                            style={{ color: "#0B1D27" }}
-                            size="xl"
-                        />
-                    </button>
-                    <button
-                        title="Next"
-                        className="absolute hidden group-hover:block right-4 w-12 h-12 mx-auto bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
-                    >
-                        <FontAwesomeIcon
-                            icon={faArrowRight}
-                            style={{ color: "#0B1D27" }}
-                            size="xl"
-                        />
-                    </button>
-                </div>
-            </section>
+            <ChartContainer />
         </main>
     );
 };
