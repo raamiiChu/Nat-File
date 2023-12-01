@@ -3,8 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Chart } from "react-google-charts";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const ChartContainer = () => {
     const data = [
@@ -98,23 +97,15 @@ const ChartContainer = () => {
 
                 <button
                     title="Previous"
-                    className="absolute hidden group-hover:block left-4 w-12 h-12 mx-auto bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
+                    className="absolute hidden group-hover:block left-4 w-12 h-12 mx-auto text-black bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
                 >
-                    <FontAwesomeIcon
-                        icon={faArrowLeft}
-                        style={{ color: "#0B1D27" }}
-                        size="xl"
-                    />
+                    <FaArrowLeft className="mx-auto scale-150" />
                 </button>
                 <button
                     title="Next"
-                    className="absolute hidden group-hover:block right-4 w-12 h-12 mx-auto bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
+                    className="absolute hidden group-hover:block right-4 w-12 h-12 mx-auto text-black bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
                 >
-                    <FontAwesomeIcon
-                        icon={faArrowRight}
-                        style={{ color: "#0B1D27" }}
-                        size="xl"
-                    />
+                    <FaArrowRight className="mx-auto scale-150" />
                 </button>
             </div>
         </section>
