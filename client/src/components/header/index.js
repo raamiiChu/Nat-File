@@ -13,7 +13,7 @@ const Header = () => {
     ];
 
     return (
-        <header className="sticky top-0 z-50 w-full grid grid-cols-12 items-center px-0 sm:px-4 bg-black bg-opacity-75 text-white text-center tracking-widest shadow-md shadow-black">
+        <header className="sticky top-0 z-50 w-full grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest shadow-md shadow-black">
             {/* homepage link */}
             <Link
                 to="/"
