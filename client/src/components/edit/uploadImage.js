@@ -26,12 +26,12 @@ const Toast = Swal.mixin({
 });
 
 const UploadImage = () => {
-    const backendUrl = "http://localhost:3001";
-
     // reducer
     const dispatch = useDispatch();
 
     // redux
+    const { backendUrl } = useSelector((state) => state.urlSlice);
+
     const { images } = useSelector((state) => state.portfolioSlice);
 
     const { isUploadingImage, isConnectingS3 } = useSelector(
