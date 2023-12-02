@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -8,13 +8,11 @@ import {
     setImages,
 } from "../../features/portfolioSlice";
 
-import {
-    setIsUploadingImage,
-    setIsConnectingS3,
-} from "../../features/triggerSlice";
+import { setIsUploadingImage } from "../../features/triggerSlice";
 
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+
+import BoardItem from "./boardItem";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "../../css/react-grid-layout.css";
@@ -50,40 +48,20 @@ const Toast = Swal.mixin({
 });
 
 const Board = () => {
-    const backendUrl = "http://localhost:3001";
-
     // reducer
     const dispatch = useDispatch();
 
     // redux
+    const { backendUrl } = useSelector((state) => state.urlSlice);
+
     const { layout, layouts, images } = useSelector(
         (state) => state.portfolioSlice
-    );
-
-    const { isUploadingImage, isConnectingS3 } = useSelector(
-        (state) => state.triggerSlice
     );
 
     // trigger on layout change
     const saveCurrLayout = (layouts) => {
         dispatch(setLayouts(layouts));
         localStorage.setItem("layouts", JSON.stringify(layouts));
-    };
-
-    // trigger by delete btn
-    const deleteImage = async (e, id, s3Key) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        await axios.delete(`${backendUrl}/images/${s3Key}`);
-
-        dispatch(
-            setImages(
-                images.filter((image) => {
-                    return image.id !== id;
-                })
-            )
-        );
     };
 
     // trigger by scale btns
@@ -245,58 +223,14 @@ const Board = () => {
                         );
                     })}
                     {images.map((image) => {
-                        const { id, title, species, time, s3Key } = image;
+                        const { id } = image;
 
                         return (
                             <div
                                 key={id}
                                 className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
                             >
-                                <div
-                                    className="not-draggable w-1/2 cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        alert(123);
-                                    }}
-                                >
-                                    <img
-                                        src={`${backendUrl}/images/${s3Key}`}
-                                        alt={title}
-                                        className="block object-cover rounded-xl"
-                                    />
-                                </div>
-                                <article>
-                                    <h2>Name: {title}</h2>
-                                    <p>Time: {time}</p>
-                                    <h3>Species: {species}</h3>
-                                </article>
-
-                                <button
-                                    className="absolute z-10 -left-5 -top-5 w-10 h-10 border border-solid border-black border-opacity-30 rounded-full shadow-2xl bg-white text-black opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                                    onClick={(e) => {
-                                        deleteImage(e, id, s3Key);
-                                    }}
-                                >
-                                    <FaRegTrashAlt className="mx-auto" />
-                                </button>
-
-                                <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-10/12 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
-                                    {scaleBtns.map((scaleBtn, index) => {
-                                        const { icon, w, h } = scaleBtn;
-
-                                        return (
-                                            <button
-                                                key={index}
-                                                className="w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg text-white hover:bg-white hover:text-black"
-                                                onClick={(e) => {
-                                                    scale(e, id, w, h);
-                                                }}
-                                            >
-                                                {icon}
-                                            </button>
-                                        );
-                                    })}
-                                </nav>
+                                <BoardItem image={image} />
                             </div>
                         );
                     })}
