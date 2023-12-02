@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { portfolioSlice } from "../features";
+import { portfolioSlice, triggerSlice } from "../features";
 
 const store = configureStore({
-    reducer: { portfolioSlice },
+    reducer: { portfolioSlice, triggerSlice },
 });
 
 export default store;
