@@ -1,3 +1,5 @@
 import ChartContainer from "./chartContainer";
+import Board from "./board";
+import UploadImage from "./uploadImage";
 
-export { ChartContainer };
+export { ChartContainer, Board, UploadImage };
