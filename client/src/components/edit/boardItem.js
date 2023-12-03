@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,6 +10,8 @@ import { LuRectangleVertical, LuRectangleHorizontal } from "react-icons/lu";
 import { IoSquareOutline } from "react-icons/io5";
 import { GoSquare } from "react-icons/go";
 import { FaRegTrashAlt } from "react-icons/fa";
+
+const boardStyles = ["board-small", "board-long", "board-tall", "border-big"];
 
 const scaleBtns = [
     { icon: <GoSquare />, w: 1, h: 1 },
@@ -30,6 +32,31 @@ const BoardItem = ({ image }) => {
     const { layout, layouts, images } = useSelector(
         (state) => state.portfolioSlice
     );
+
+    // state
+    const [boardIndex, setBoardIndex] = useState(() => {
+        const layouts = JSON.parse(localStorage.getItem("layouts"));
+
+        const foundLayout = layouts["lg"].filter((layout) => {
+            return layout.i === id;
+        });
+
+        if (!foundLayout) {
+            return 0;
+        }
+
+        const { w, h } = foundLayout[0];
+
+        if (w === 1 && h === 1) {
+            return 0;
+        } else if (w === 2 && h === 1) {
+            return 1;
+        } else if (w === 1 && h === 2) {
+            return 2;
+        } else if (w === 2 && h === 2) {
+            return 3;
+        }
+    });
 
     // trigger by delete btn
     const deleteImage = async (e, id, s3Key) => {
@@ -55,7 +82,7 @@ const BoardItem = ({ image }) => {
         // Create a deep copy of the layouts
         const updatedLayouts = JSON.parse(JSON.stringify(layouts));
         const layoutIndex = layout.findIndex((item) => item.i === String(key));
-
+        console.log(layoutIndex);
         if (layoutIndex !== -1) {
             // Update the specific layout item's width
             if (updatedLayouts.lg) {
@@ -90,9 +117,9 @@ const BoardItem = ({ image }) => {
     };
 
     return (
-        <>
+        <div className={`${boardStyles[boardIndex]}`}>
             <div
-                className="not-draggable w-1/2 cursor-pointer"
+                className="not-draggable"
                 onClick={(e) => {
                     e.stopPropagation();
                     alert(123);
@@ -101,7 +128,7 @@ const BoardItem = ({ image }) => {
                 <img
                     src={`${backendUrl}/images/${s3Key}`}
                     alt={title}
-                    className="block object-cover rounded-xl"
+                    className="object-contain object-center rounded-xl"
                 />
             </div>
             <article>
@@ -119,16 +146,21 @@ const BoardItem = ({ image }) => {
                 <FaRegTrashAlt className="mx-auto" />
             </button>
 
-            <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-10/12 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
+            <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 px-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
                 {scaleBtns.map((scaleBtn, index) => {
                     const { icon, w, h } = scaleBtn;
 
                     return (
                         <button
                             key={index}
-                            className="w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg text-white hover:bg-white hover:text-black"
+                            className={`${
+                                index === boardIndex
+                                    ? "bg-white text-black"
+                                    : "bg-black text-white"
+                            } w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg hover:bg-white hover:text-black`}
                             onClick={(e) => {
                                 scale(e, id, w, h);
+                                setBoardIndex(index);
                             }}
                         >
                             {icon}
@@ -136,7 +168,7 @@ const BoardItem = ({ image }) => {
                     );
                 })}
             </nav>
-        </>
+        </div>
     );
 };
 

@@ -17,24 +17,11 @@ import BoardItem from "./boardItem";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "../../css/react-grid-layout.css";
 
-import { LuRectangleVertical, LuRectangleHorizontal } from "react-icons/lu";
-import { IoSquareOutline } from "react-icons/io5";
-import { GoSquare } from "react-icons/go";
-import { FaRegTrashAlt } from "react-icons/fa";
 import { FaPlus, FaSave } from "react-icons/fa";
 
 import Swal from "sweetalert2";
 
-import fox from "../../images/fox.jpg";
-
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
-const scaleBtns = [
-    { icon: <GoSquare />, w: 1, h: 1 },
-    { icon: <LuRectangleHorizontal />, w: 2, h: 1 },
-    { icon: <LuRectangleVertical />, w: 1, h: 2 },
-    { icon: <IoSquareOutline />, w: 2, h: 2 },
-];
 
 const Toast = Swal.mixin({
     toast: true,
@@ -54,55 +41,12 @@ const Board = () => {
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
 
-    const { layout, layouts, images } = useSelector(
-        (state) => state.portfolioSlice
-    );
+    const { layouts, images } = useSelector((state) => state.portfolioSlice);
 
     // trigger on layout change
     const saveCurrLayout = (layouts) => {
         dispatch(setLayouts(layouts));
         localStorage.setItem("layouts", JSON.stringify(layouts));
-    };
-
-    // trigger by scale btns
-    const scale = (e, key, width = 1, height = 1) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Create a deep copy of the layouts
-        const updatedLayouts = JSON.parse(JSON.stringify(layouts));
-        const layoutIndex = layout.findIndex((item) => item.i === String(key));
-
-        if (layoutIndex !== -1) {
-            // Update the specific layout item's width
-            if (updatedLayouts.lg) {
-                updatedLayouts.lg[layoutIndex] = {
-                    ...updatedLayouts.lg[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            // Assuming there's an 'md' array in your layouts state, update it as well
-            if (updatedLayouts.md) {
-                updatedLayouts.md[layoutIndex] = {
-                    ...updatedLayouts.md[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            // Assuming there's an 'sm' array in your layouts state, update it as well
-            if (updatedLayouts.sm) {
-                updatedLayouts.sm[layoutIndex] = {
-                    ...updatedLayouts.sm[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            saveCurrLayout(updatedLayouts); // Set the updated layouts
-        }
     };
 
     // trigger by save btn
@@ -132,6 +76,7 @@ const Board = () => {
 
         if (portfolio.length !== 0) {
             const { images, layouts } = portfolio[0];
+
             localStorage.setItem("images", JSON.stringify(images));
             localStorage.setItem("layouts", JSON.stringify(layouts));
             dispatch(setImages(images));
@@ -155,80 +100,28 @@ const Board = () => {
                     className="layout col-span-full"
                     layouts={layouts}
                     breakpoints={{
-                        lg: 1280,
-                        md: 640,
-                        sm: 550,
+                        lg: 720,
+                        md: 480,
+                        sm: 320,
                     }}
-                    cols={{ lg: 8, md: 4, sm: 2 }}
+                    cols={{ lg: 6, md: 4, sm: 2 }}
                     resizeHandles={[]}
+                    margin={[20, 50]}
+                    containerPadding={[20, 20]}
+                    rowHeight={140}
+                    draggableCancel=".not-draggable"
                     onLayoutChange={(layout, layouts) => {
                         dispatch(setLayout(layout));
                         saveCurrLayout(layouts);
                     }}
-                    margin={[20, 50]}
-                    containerPadding={[20, 20]}
-                    rowHeight={150}
-                    draggableCancel=".not-draggable"
                 >
-                    {[1, 2, 3].map((item) => {
-                        return (
-                            <div
-                                key={item}
-                                className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
-                            >
-                                <div
-                                    className="not-draggable w-1/2 cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        alert(123);
-                                    }}
-                                >
-                                    <img
-                                        src={fox}
-                                        alt="fox"
-                                        className="block object-cover rounded-xl"
-                                    />
-                                </div>
-                                <article>
-                                    <h2>Name: {item}</h2>
-                                    <p>Time: {new Date().toDateString()}</p>
-                                    <h3>Species: Fox</h3>
-                                </article>
-
-                                <button
-                                    className="absolute z-10 -left-5 -top-5 w-10 h-10 flex justify-center items-center shadow-2xl rounded-full bg-white text-black opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                                    onClick={null}
-                                >
-                                    <FaRegTrashAlt />
-                                </button>
-
-                                <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-10/12 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
-                                    {scaleBtns.map((scaleBtn, index) => {
-                                        const { icon, w, h } = scaleBtn;
-
-                                        return (
-                                            <button
-                                                key={index}
-                                                className="w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg text-white hover:bg-white hover:text-black"
-                                                onClick={(e) => {
-                                                    scale(e, item, w, h);
-                                                }}
-                                            >
-                                                {icon}
-                                            </button>
-                                        );
-                                    })}
-                                </nav>
-                            </div>
-                        );
-                    })}
                     {images.map((image) => {
                         const { id } = image;
 
                         return (
                             <div
                                 key={id}
-                                className="group p-2 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
+                                className="group relative p-3 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
                             >
                                 <BoardItem image={image} />
                             </div>

@@ -141,3 +141,85 @@ body {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .board-small {
+        @apply h-[130px];
+    }
+    .board-small div {
+        @apply h-5/6 flex justify-center items-center -mt-1 cursor-pointer;
+    }
+    .board-small div img {
+        @apply rounded-xl;
+    }
+    .board-small article {
+        @apply absolute left-1/2 bottom-0 -translate-x-1/2 w-2/3;
+    }
+    .board-small article h2 {
+        @apply flex flex-nowrap justify-center overflow-hidden;
+    }
+    .board-small article p {
+        @apply hidden;
+    }
+    .board-small article h3 {
+        @apply hidden;
+    }
+
+    .board-long {
+        @apply h-[120px] grid grid-cols-2 gap-x-4;
+    }
+    .board-long div {
+        @apply h-full flex justify-center items-center cursor-pointer;
+    }
+
+    .board-long article {
+        @apply my-auto;
+    }
+    .board-long article h2 {
+        @apply flex flex-nowrap overflow-hidden;
+    }
+    .board-long article p {
+        @apply block mb-3 text-xs;
+    }
+    .board-long article h3 {
+        @apply text-sm;
+    }
+
+    .board-tall {
+        @apply flex flex-col gap-y-2 px-2 py-4;
+    }
+    .board-tall div {
+        @apply max-h-[150px] flex items-center cursor-pointer;
+    }
+    .board-tall article {
+        @apply grid gap-y-1.5;
+    }
+    .board-tall article h2 {
+        @apply flex flex-nowrap overflow-hidden;
+    }
+    .board-tall article p {
+        @apply text-xs;
+    }
+    .board-tall article h3 {
+        @apply text-sm;
+    }
+
+    .board-big {
+        @apply flex flex-col gap-y-2 px-2 py-4;
+    }
+    .board-big div {
+        @apply flex justify-center items-center cursor-pointer;
+    }
+    .board-big article {
+        @apply grid gap-y-1.5;
+    }
+    .board-big article h2 {
+        @apply flex flex-nowrap overflow-hidden;
+    }
+    .board-big article p {
+        @apply text-xs;
+    }
+    .board-big article h3 {
+        @apply text-sm;
+    }
+}
