@@ -45,16 +45,21 @@ const BoardItem = ({ image }) => {
             return 0;
         }
 
-        const { w, h } = foundLayout[0];
+        try {
+            const { w, h } = foundLayout[0];
 
-        if (w === 1 && h === 1) {
+            if (w === 1 && h === 1) {
+                return 0;
+            } else if (w === 2 && h === 1) {
+                return 1;
+            } else if (w === 1 && h === 2) {
+                return 2;
+            } else if (w === 2 && h === 2) {
+                return 3;
+            }
+        } catch (error) {
+            // first time upload image
             return 0;
-        } else if (w === 2 && h === 1) {
-            return 1;
-        } else if (w === 1 && h === 2) {
-            return 2;
-        } else if (w === 2 && h === 2) {
-            return 3;
         }
     });
 
