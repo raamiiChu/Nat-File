@@ -96,7 +96,6 @@ const UploadImage = () => {
 
     return (
         <section
-            id="test"
             className={`${
                 isUploadingImage ? "block" : "hidden"
             } absolute top-0 left-0 z-30 w-full h-full flex justify-center items-center bg-black bg-opacity-50`}
