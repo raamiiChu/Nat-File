@@ -3,9 +3,17 @@ import express from "express";
 
 import cors from "cors";
 
+import passport from "passport";
+import "./config/passport.js";
+
 import sequelize from "./db.js";
 
-import { userRoute, portfolioRoute } from "./routes/index.js";
+import {
+    userRoute,
+    portfolioRoute,
+    imagesRoute,
+    authRoute,
+} from "./routes/index.js";
 
 const app = express();
 const port = 3001;
@@ -22,6 +30,8 @@ app.use(cors(corsOptions));
 
 app.use("/user", userRoute);
 app.use("/portfolio", portfolioRoute);
+app.use("/images", imagesRoute);
+app.use("/auth", passport.authenticate("jwt", { session: false }), authRoute);
 
 app.get("/", (req, res) => {
     res.send("Home Page");

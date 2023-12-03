@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+
+import { useSelector, useDispatch } from "react-redux";
+import { setIsSign } from "../../features/triggerSlice";
+
+import { FaBars } from "react-icons/fa";
+
 const Header = () => {
+    const dispatch = useDispatch();
+
+    const { isSign } = useSelector((state) => state.triggerSlice);
+
     const [showMenu, setShowMenu] = useState(false);
     const navLinks = [
         ["About", "/about"],
@@ -12,7 +20,7 @@ const Header = () => {
     ];
 
     return (
-        <header className="sticky top-0 z-50 w-full grid grid-cols-12 items-center px-0 sm:px-4 bg-black bg-opacity-75 text-white text-center tracking-widest shadow-md shadow-black">
+        <header className="sticky top-0 z-50 w-full grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest shadow-md shadow-black">
             {/* homepage link */}
             <Link
                 to="/"
@@ -36,18 +44,23 @@ const Header = () => {
                 })}
             </ul>
 
-            <Link className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75">
+            <Link
+                className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
+                onClick={() => {
+                    dispatch(setIsSign(!isSign));
+                }}
+            >
                 Sign In / Up
             </Link>
 
             {/* mobile toggle */}
             <button
-                className="block sm:hidden col-span-3 m-auto hover:opacity-75"
+                className="block sm:hidden col-span-3 m-auto p-5 hover:opacity-75"
                 onClick={() => {
                     setShowMenu(!showMenu);
                 }}
             >
-                <FontAwesomeIcon className="p-5" icon={faBars} size="xl" />
+                <FaBars className="scale-150" />
             </button>
 
             {/* mobile links */}
@@ -71,7 +84,14 @@ const Header = () => {
                         </Link>
                     );
                 })}
-                <Link className="py-2.5 hover:opacity-75">Sign In / Up</Link>
+                <Link
+                    className="py-2.5 hover:opacity-75"
+                    onClick={() => {
+                        dispatch(setIsSign(!isSign));
+                    }}
+                >
+                    Sign In / Up
+                </Link>
             </ul>
         </header>
     );

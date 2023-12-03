@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { User } from "../models/index.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const saltRounds = 10;
 
@@ -33,11 +34,10 @@ route.post("/signup", (req, res) => {
 });
 
 route.post("/signin", async (req, res) => {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
     const foundUser = await User.findOne({
         where: {
-            name,
             email,
         },
     });
@@ -46,7 +46,7 @@ route.post("/signin", async (req, res) => {
         return res.status(404).send("User no Found");
     }
 
-    const foundPassword = foundUser.password;
+    const { name, password: foundPassword } = foundUser;
 
     // Load hash from your password DB.
     bcrypt.compare(password, foundPassword, (err, isMatch) => {
@@ -56,7 +56,21 @@ route.post("/signin", async (req, res) => {
 
         if (isMatch) {
             // Correct
-            return res.status(200).send("correct");
+
+            const tokenObject = {
+                name,
+                email,
+            };
+
+            const access_expired = 3600;
+            const token = jwt.sign(tokenObject, process.env.JWT_SECRET, {
+                expiresIn: access_expired,
+            });
+
+            // token = "JWT " + token
+            return res.status(200).send({
+                token: "JWT " + token,
+            });
         } else {
             // Not Correct
             return res.status(400).send("not correct");
