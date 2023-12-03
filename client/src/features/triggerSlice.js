@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     isUploadingImage: false,
     isConnectingS3: false,
+    isSign: false,
 };
 
 export const triggerSlice = createSlice({
@@ -16,9 +17,14 @@ export const triggerSlice = createSlice({
         setIsConnectingS3: (state, action) => {
             state.isConnectingS3 = action.payload;
         },
+
+        setIsSign: (state, action) => {
+            state.isSign = action.payload;
+        },
     },
 });
 
-export const { setIsUploadingImage, setIsConnectingS3 } = triggerSlice.actions;
+export const { setIsUploadingImage, setIsConnectingS3, setIsSign } =
+    triggerSlice.actions;
 
 export default triggerSlice.reducer;

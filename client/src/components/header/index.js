@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { useSelector, useDispatch } from "react-redux";
+import { setIsSign } from "../../features/triggerSlice";
+
 import { FaBars } from "react-icons/fa";
 
 const Header = () => {
+    const dispatch = useDispatch();
+
+    const { isSign } = useSelector((state) => state.triggerSlice);
+
     const [showMenu, setShowMenu] = useState(false);
     const navLinks = [
         ["About", "/about"],
@@ -37,7 +44,12 @@ const Header = () => {
                 })}
             </ul>
 
-            <Link className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75">
+            <Link
+                className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
+                onClick={() => {
+                    dispatch(setIsSign(!isSign));
+                }}
+            >
                 Sign In / Up
             </Link>
 
@@ -72,7 +84,14 @@ const Header = () => {
                         </Link>
                     );
                 })}
-                <Link className="py-2.5 hover:opacity-75">Sign In / Up</Link>
+                <Link
+                    className="py-2.5 hover:opacity-75"
+                    onClick={() => {
+                        dispatch(setIsSign(!isSign));
+                    }}
+                >
+                    Sign In / Up
+                </Link>
             </ul>
         </header>
     );
