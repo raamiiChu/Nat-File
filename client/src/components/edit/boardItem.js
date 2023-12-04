@@ -87,7 +87,7 @@ const BoardItem = ({ image }) => {
         // Create a deep copy of the layouts
         const updatedLayouts = JSON.parse(JSON.stringify(layouts));
         const layoutIndex = layout.findIndex((item) => item.i === String(key));
-        console.log(layoutIndex);
+
         if (layoutIndex !== -1) {
             // Update the specific layout item's width
             if (updatedLayouts.lg) {
@@ -131,7 +131,7 @@ const BoardItem = ({ image }) => {
                 }}
             >
                 <img
-                    src={`${backendUrl}/images/${s3Key}`}
+                    src={`https://stylish-images-storage.s3.ap-northeast-1.amazonaws.com/${s3Key}`}
                     alt={title}
                     className="object-contain object-center rounded-xl"
                 />

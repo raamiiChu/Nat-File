@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+    setPortfolioId,
     setLayout,
     setLayouts,
     setImages,
@@ -40,8 +41,9 @@ const Board = () => {
 
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
-
-    const { layouts, images } = useSelector((state) => state.portfolioSlice);
+    const { portfolioId, layouts, images } = useSelector(
+        (state) => state.portfolioSlice
+    );
 
     // trigger on layout change
     const saveCurrLayout = (layouts) => {
@@ -51,36 +53,55 @@ const Board = () => {
 
     // trigger by save btn
     const saveToDatabase = async (e) => {
-        const res = await axios.post(`${backendUrl}/portfolio/save`, {
-            email: "jane23@fake.com",
-            layouts,
-            images,
-        });
+        const user = localStorage.getItem("user");
 
-        if (!e) {
-            return;
-        }
-
-        if (res.status === 200) {
-            Toast.fire({
-                icon: "success",
-                title: "Your work has been saved",
+        try {
+            const res = await axios.post(`${backendUrl}/portfolio/save`, {
+                id: portfolioId,
+                email: user,
+                layouts,
+                images,
             });
+
+            if (!e) {
+                return;
+            }
+
+            if (res.status === 200) {
+                Toast.fire({
+                    icon: "success",
+                    title: "Your work has been saved",
+                });
+            }
+        } catch (error) {
+            console.log(error);
         }
     };
 
     // set layouts & images from db to local storage ( if exist )
     const loadFromDatabase = async () => {
-        const res = await axios.get(`${backendUrl}/portfolio/load`);
-        const portfolio = res.data.Portfolios;
+        const user = localStorage.getItem("user");
 
-        if (portfolio.length !== 0) {
-            const { images, layouts } = portfolio[0];
+        try {
+            const { data: portfolio } = await axios.post(
+                `${backendUrl}/portfolio/load`,
+                {
+                    id: portfolioId,
+                    email: user,
+                }
+            );
 
+            const { id, images, layouts } = portfolio;
+
+            localStorage.setItem("portfolioId", JSON.stringify(id));
             localStorage.setItem("images", JSON.stringify(images));
             localStorage.setItem("layouts", JSON.stringify(layouts));
+
+            dispatch(setPortfolioId(id));
             dispatch(setImages(images));
             dispatch(setLayouts(layouts));
+        } catch (error) {
+            console.log(error);
         }
     };
 
@@ -115,7 +136,7 @@ const Board = () => {
                         saveCurrLayout(layouts);
                     }}
                 >
-                    {images.map((image) => {
+                    {images?.map((image) => {
                         const { id } = image;
 
                         return (
