@@ -38,22 +38,6 @@ export async function uploadFile(file, uuid, currTime, name) {
     }
 }
 
-// downloads a file from s3
-export function downloadFile(fileKey) {
-    const params = {
-        Key: fileKey,
-        Bucket: BucketName,
-    };
-
-    try {
-        const result = s3.getObject(params).createReadStream();
-        return result;
-    } catch (err) {
-        console.error(`Error downloading file: ${fileKey}`, err);
-        throw err;
-    }
-}
-
 // delete a file from S3
 export async function deleteFile(fileKey) {
     const params = {
