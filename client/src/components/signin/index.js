@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setIsSign } from "../../features/triggerSlice";
+import { setIsAuth } from "../../features/userSlice";
 
 import axios from "axios";
 
@@ -13,8 +14,43 @@ const Signin = () => {
     const [formAction, setFormAction] = useState("");
 
     const { isSign } = useSelector((state) => state.triggerSlice);
+    const { backendUrl } = useSelector((state) => state.urlSlice);
 
-    const userSignin = async (e) => {
+    const signIn = async (email, password) => {
+        const url = `${backendUrl}/user/signin`;
+
+        try {
+            const { data, status } = await axios.post(url, {
+                email,
+                password,
+            });
+
+            if (status === 200) {
+                const { token } = data;
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", email);
+
+                alert("Login !!!");
+                dispatch(setIsSign(false));
+                dispatch(setIsAuth(true));
+                navigate("/profile");
+            }
+        } catch (error) {
+            const { status } = error.response;
+
+            // wrong email or password
+            if (status === 403) {
+                alert("email or password is not correct");
+            }
+
+            // user no found
+            if (status === 404) {
+                alert("Please sign up first");
+            }
+        }
+    };
+
+    const formHandler = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const formObject = {};
@@ -28,61 +64,28 @@ const Signin = () => {
         try {
             let url;
             if (formAction === "Sign Up") {
-                url = "http://localhost:3001/user/signup";
-            } else {
-                url = "http://localhost:3001/user/signin";
+                url = `${backendUrl}/user/signup`;
+                await axios.post(url, { email, password });
             }
 
-            let { data, status } = await axios.post(url, {
-                email,
-                password,
-            });
-
-            if (formAction === "Sign Up") {
-                let res = await axios.post(url, {
-                    email,
-                    password,
-                });
-
-                data = res.data;
-                status = res.status;
-            }
-
-            if (status === 200) {
-                const { token } = data;
-                localStorage.setItem("token", token);
-                localStorage.setItem("user", email);
-
-                alert("Login !!!");
-                dispatch(setIsSign(false));
-                navigate("/profile");
-            }
+            signIn(email, password);
         } catch (error) {
             const { status, data } = error.response;
 
+            // user no found
             if (status === 404) {
                 alert(data);
             }
 
+            // wrong email or password
+            if (status === 403) {
+                alert(data);
+            }
+
+            // user exists
             if (status === 409) {
-                const { data, status } = await axios.post(
-                    "http://localhost:3001/user/signin",
-                    {
-                        email,
-                        password,
-                    }
-                );
-
-                if (status === 200) {
-                    const { token } = data;
-                    localStorage.setItem("token", token);
-                    localStorage.setItem("user", email);
-
-                    console.log(token);
-                    alert("Login !!!");
-                    dispatch(setIsSign(false));
-                    navigate("/profile");
-                }
+                // sign in directly
+                signIn(email, password);
             }
         }
     };
@@ -106,7 +109,7 @@ const Signin = () => {
                 <form
                     className="grid gap-y-2 text-left"
                     onSubmit={(e) => {
-                        userSignin(e);
+                        formHandler(e);
                     }}
                 >
                     <section className="flex justify-around">
