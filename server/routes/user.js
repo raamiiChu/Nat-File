@@ -71,10 +71,7 @@ route.post("/signin", async (req, res) => {
                 email,
             };
 
-            const access_expired = 3600;
-            const token = jwt.sign(tokenObject, process.env.JWT_SECRET, {
-                expiresIn: access_expired,
-            });
+            const token = jwt.sign(tokenObject, process.env.JWT_SECRET);
 
             // token = "JWT " + token
             return res.status(200).send({
