@@ -11,10 +11,18 @@ route.use((req, res, next) => {
     next();
 });
 
-route.post("/signup", (req, res) => {
-    const { name, email, password } = req.body;
+route.post("/signup", async (req, res) => {
+    const { email, password } = req.body;
 
-    res.send({ name, email, password });
+    const foundUser = await User.findOne({
+        where: {
+            email,
+        },
+    });
+
+    if (foundUser) {
+        return res.status(409).send("User exists");
+    }
 
     // hash a password
     bcrypt.genSalt(saltRounds, (err, salt) => {
@@ -28,7 +36,9 @@ route.post("/signup", (req, res) => {
             }
 
             // Store your password
-            await User.create({ name, email, password: hash });
+            await User.create({ email, password: hash });
+
+            return res.status(307).redirect("/user/signin");
         });
     });
 });
@@ -46,7 +56,7 @@ route.post("/signin", async (req, res) => {
         return res.status(404).send("User no Found");
     }
 
-    const { name, password: foundPassword } = foundUser;
+    const { password: foundPassword } = foundUser;
 
     // Load hash from your password DB.
     bcrypt.compare(password, foundPassword, (err, isMatch) => {
@@ -58,7 +68,6 @@ route.post("/signin", async (req, res) => {
             // Correct
 
             const tokenObject = {
-                name,
                 email,
             };
 
