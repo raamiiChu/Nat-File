@@ -94,26 +94,35 @@ const Signin = () => {
         <div
             className={`${
                 isSign ? "block" : "hidden"
-            } fixed top-0 left-0 z-20 w-full h-full flex justify-center items-center bg-black bg-opacity-50`}
+            } fixed top-0 left-0 z-50 w-full h-full flex justify-center items-center bg-black bg-opacity-50`}
             onClick={() => {
                 dispatch(setIsSign(false));
             }}
         >
             <div
-                className="w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 bg-white text-center"
+                className="w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 text-center bg-white rounded-lg shadow-lg"
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
             >
-                <h2>Sign In</h2>
+                <div className="p-4">
+                    <h2 className="text-xl font-bold">Welcome!</h2>
+                    <p className="text-base">
+                        Sign in to access your account or sign up to join.
+                    </p>
+                </div>
+
                 <form
-                    className="grid gap-y-2 text-left"
+                    className="grid gap-y-3 my-1.5 text-left"
                     onSubmit={(e) => {
                         formHandler(e);
                     }}
                 >
-                    <section className="flex justify-around">
-                        <label htmlFor="email" className="w-1/4">
+                    <section className="grid grid-cols-12 justify-around items-center">
+                        <label
+                            htmlFor="email"
+                            className="col-start-2 col-span-3 text-base"
+                        >
                             email:
                         </label>
                         <input
@@ -122,12 +131,16 @@ const Signin = () => {
                             id="email"
                             required
                             defaultValue={"jane23@fake.com"}
-                            className="form-input border border-solid border-black focus:outline-none"
+                            placeholder="email"
+                            className="form-input col-start-6 col-span-6 py-1 indent-4 border-2 border-solid border-black rounded-xl focus:outline-none"
                         />
                     </section>
 
-                    <section className="flex justify-around">
-                        <label htmlFor="password" className="w-1/4">
+                    <section className="grid grid-cols-12 justify-around items-center">
+                        <label
+                            htmlFor="password"
+                            className="col-start-2 col-span-3 text-base"
+                        >
                             password:
                         </label>
                         <input
@@ -136,14 +149,21 @@ const Signin = () => {
                             id="password"
                             required
                             defaultValue={"123ASDspdo$"}
-                            className="form-input border border-solid border-black focus:outline-none"
+                            placeholder="password"
+                            className="form-input col-start-6 col-span-6 py-1 indent-4 border-2 border-solid border-black rounded-xl focus:outline-none"
+                            onFocus={(e) => {
+                                e.target.type = "text";
+                            }}
+                            onBlur={(e) => {
+                                e.target.type = "password";
+                            }}
                         />
                     </section>
 
-                    <div className="w-full grid grid-cols-12">
+                    <div className="grid grid-cols-12 mt-2">
                         <button
                             type="submit"
-                            className="form-input col-start-3 col-span-3 p-1 border border-solid border-black rounded-lg bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
+                            className="form-input col-start-3 col-span-3 p-1 border border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign Up");
                             }}
@@ -153,7 +173,7 @@ const Signin = () => {
 
                         <button
                             type="submit"
-                            className="form-input col-start-8 col-span-3 p-1 border border-solid border-black rounded-lg bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
+                            className="form-input col-start-8 col-span-3 p-1 border border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign In");
                             }}
