@@ -28,6 +28,9 @@ const Header = () => {
 
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("images");
+        localStorage.removeItem("portfolioId");
+        localStorage.removeItem("layouts");
         dispatch(setIsAuth(false));
 
         alert("logout!!");
