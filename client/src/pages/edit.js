@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ChartContainer, Board, UploadImage } from "../components/edit";
@@ -30,7 +30,6 @@ const Edit = () => {
         <main className="relative bg-[url('../images/edit-bg.jpg')] bg-cover bg-no-repeat bg-top">
             <Board />
 
-            {/* upload image */}
             <UploadImage />
 
             <ChartContainer />
