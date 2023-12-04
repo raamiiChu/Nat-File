@@ -75,7 +75,7 @@ const Header = () => {
                         dispatch(setIsSign(!isSign));
                     }}
                 >
-                    Sign In / Up
+                    Sign Up / In
                 </Link>
             )}
             {isAuth && (
@@ -128,7 +128,7 @@ const Header = () => {
                             dispatch(setIsSign(!isSign));
                         }}
                     >
-                        Sign In / Up
+                        Sign Up / In
                     </Link>
                 )}
                 {isAuth && (
