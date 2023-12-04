@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -9,6 +9,8 @@ import axios from "axios";
 const Signin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const [formAction, setFormAction] = useState("");
 
     const { isSign } = useSelector((state) => state.triggerSlice);
 
@@ -24,17 +26,33 @@ const Signin = () => {
         const { email, password } = formObject;
 
         try {
-            const { data, status } = await axios.post(
-                "http://localhost:3001/user/signin",
-                {
+            let url;
+            if (formAction === "Sign Up") {
+                url = "http://localhost:3001/user/signup";
+            } else {
+                url = "http://localhost:3001/user/signin";
+            }
+
+            let { data, status } = await axios.post(url, {
+                email,
+                password,
+            });
+
+            if (formAction === "Sign Up") {
+                let res = await axios.post(url, {
                     email,
                     password,
-                }
-            );
+                });
+
+                data = res.data;
+                status = res.status;
+            }
 
             if (status === 200) {
                 const { token } = data;
                 localStorage.setItem("token", token);
+                localStorage.setItem("user", email);
+
                 alert("Login !!!");
                 dispatch(setIsSign(false));
                 navigate("/profile");
@@ -44,6 +62,27 @@ const Signin = () => {
 
             if (status === 404) {
                 alert(data);
+            }
+
+            if (status === 409) {
+                const { data, status } = await axios.post(
+                    "http://localhost:3001/user/signin",
+                    {
+                        email,
+                        password,
+                    }
+                );
+
+                if (status === 200) {
+                    const { token } = data;
+                    localStorage.setItem("token", token);
+                    localStorage.setItem("user", email);
+
+                    console.log(token);
+                    alert("Login !!!");
+                    dispatch(setIsSign(false));
+                    navigate("/profile");
+                }
             }
         }
     };
@@ -63,8 +102,9 @@ const Signin = () => {
                     e.stopPropagation();
                 }}
             >
+                <h2>Sign In</h2>
                 <form
-                    className="text-left"
+                    className="grid gap-y-2 text-left"
                     onSubmit={(e) => {
                         userSignin(e);
                     }}
@@ -78,7 +118,7 @@ const Signin = () => {
                             name="email"
                             id="email"
                             required
-                            value={"jane23@fake.com"}
+                            defaultValue={"jane23@fake.com"}
                             className="form-input border border-solid border-black focus:outline-none"
                         />
                     </section>
@@ -92,12 +132,32 @@ const Signin = () => {
                             name="password"
                             id="password"
                             required
-                            value={"123ASDspdo$"}
+                            defaultValue={"123ASDspdo$"}
                             className="form-input border border-solid border-black focus:outline-none"
                         />
                     </section>
 
-                    <button type="submit">Submit</button>
+                    <div className="w-full grid grid-cols-12">
+                        <button
+                            type="submit"
+                            className="form-input col-start-3 col-span-3 p-1 border border-solid border-black rounded-lg bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
+                            onClick={(e) => {
+                                setFormAction("Sign Up");
+                            }}
+                        >
+                            Sign Up
+                        </button>
+
+                        <button
+                            type="submit"
+                            className="form-input col-start-8 col-span-3 p-1 border border-solid border-black rounded-lg bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
+                            onClick={(e) => {
+                                setFormAction("Sign In");
+                            }}
+                        >
+                            Sign In
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
