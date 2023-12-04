@@ -41,6 +41,7 @@ const Board = () => {
 
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
+    const { isAuth } = useSelector((state) => state.userSlice);
     const { portfolioId, layouts, images } = useSelector(
         (state) => state.portfolioSlice
     );
@@ -106,10 +107,18 @@ const Board = () => {
     };
 
     useEffect(() => {
+        if (!isAuth) {
+            return;
+        }
+
         loadFromDatabase();
     }, []);
 
     useEffect(() => {
+        if (!isAuth) {
+            return;
+        }
+
         localStorage.setItem("images", JSON.stringify(images));
         saveToDatabase();
     }, [images]);
