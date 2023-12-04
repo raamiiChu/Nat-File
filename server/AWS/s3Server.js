@@ -55,4 +55,4 @@ export async function deleteFile(fileKey) {
     }
 }
 
-export default { uploadFile, downloadFile, deleteFile };
+export default { uploadFile, deleteFile };

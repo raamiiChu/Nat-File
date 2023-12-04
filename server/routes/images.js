@@ -2,7 +2,7 @@ import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 
-import { uploadFile, downloadFile, deleteFile } from "../AWS/s3Server.js";
+import { uploadFile, deleteFile } from "../AWS/s3Server.js";
 
 const route = Router();
 
