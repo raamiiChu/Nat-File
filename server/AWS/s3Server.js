@@ -17,6 +17,7 @@ export async function uploadFile(file, uuid, currTime, name) {
         Bucket: BucketName,
         Body: fileStream,
         Key: `${uuid}-${currTime}-${name}`,
+        ContentType: "image/jpeg",
     };
 
     try {
