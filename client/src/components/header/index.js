@@ -1,23 +1,38 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setIsSign } from "../../features/triggerSlice";
+import { setIsAuth } from "../../features/userSlice";
 
 import { FaBars } from "react-icons/fa";
 
 const Header = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { isSign } = useSelector((state) => state.triggerSlice);
+    const { isAuth } = useSelector((state) => state.userSlice);
 
     const [showMenu, setShowMenu] = useState(false);
     const navLinks = [
         ["About", "/about"],
-        ["Edit", "/edit"],
         ["View", "/view"],
+        ["Edit", "/edit"],
         ["Profile", "/profile"],
     ];
+
+    const signOut = (e) => {
+        e.preventDefault();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        dispatch(setIsAuth(false));
+
+        alert("logout!!");
+        navigate("/");
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest shadow-md shadow-black">
@@ -32,6 +47,11 @@ const Header = () => {
             {/* laptop links */}
             <ul className="col-span-6 lg:col-span-4 hidden sm:grid grid-cols-4 items-center text:lg lg:text-xl">
                 {navLinks.map((navLink, index) => {
+                    // edit & profile will not shown if user not sign in
+                    if (!isAuth && index >= 2) {
+                        return <></>;
+                    }
+
                     return (
                         <Link
                             key={index}
@@ -44,14 +64,27 @@ const Header = () => {
                 })}
             </ul>
 
-            <Link
-                className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
-                onClick={() => {
-                    dispatch(setIsSign(!isSign));
-                }}
-            >
-                Sign In / Up
-            </Link>
+            {/* switch btn if user sign in or sign out */}
+            {!isAuth && (
+                <Link
+                    className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
+                    onClick={() => {
+                        dispatch(setIsSign(!isSign));
+                    }}
+                >
+                    Sign In / Up
+                </Link>
+            )}
+            {isAuth && (
+                <Link
+                    className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
+                    onClick={(e) => {
+                        signOut(e);
+                    }}
+                >
+                    Sign Out
+                </Link>
+            )}
 
             {/* mobile toggle */}
             <button
@@ -84,14 +117,27 @@ const Header = () => {
                         </Link>
                     );
                 })}
-                <Link
-                    className="py-2.5 hover:opacity-75"
-                    onClick={() => {
-                        dispatch(setIsSign(!isSign));
-                    }}
-                >
-                    Sign In / Up
-                </Link>
+
+                {!isAuth && (
+                    <Link
+                        className="py-2.5 hover:opacity-75"
+                        onClick={() => {
+                            dispatch(setIsSign(!isSign));
+                        }}
+                    >
+                        Sign In / Up
+                    </Link>
+                )}
+                {isAuth && (
+                    <Link
+                        className="py-2.5 hover:opacity-75"
+                        onClick={(e) => {
+                            signOut(e);
+                        }}
+                    >
+                        Sign Out
+                    </Link>
+                )}
             </ul>
         </header>
     );
