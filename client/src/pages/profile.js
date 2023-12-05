@@ -55,13 +55,6 @@ const Profile = () => {
         navigate("/edit");
     };
 
-    const createNewPortfolio = (e) => {
-        e.preventDefault();
-        localStorage.setItem("portfolioId", null);
-        dispatch(setPortfolioId(null));
-        navigate("/edit");
-    };
-
     useEffect(() => {
         checkUser();
         getAllPortfolio();
@@ -73,7 +66,7 @@ const Profile = () => {
                 <Link
                     className="px-2 sm:px-6 py-1.5 sm:py-2.5 border-2 border-black border-solid rounded-3xl bg-white text-black hover:text-white hover:bg-black transition-all duration-300"
                     onClick={(e) => {
-                        createNewPortfolio(e);
+                        toEditPage(e, null);
                     }}
                 >
                     Create New Portfolio
