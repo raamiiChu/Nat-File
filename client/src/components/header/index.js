@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setIsSign } from "../../features/triggerSlice";
-import { setIsAuth } from "../../features/userSlice";
+import { setUserId, setUser, setIsAuth } from "../../features/userSlice";
+import { setPortfolioId } from "../../features/portfolioSlice";
 
 import { FaBars } from "react-icons/fa";
 
@@ -26,12 +27,12 @@ const Header = () => {
     const signOut = (e) => {
         e.preventDefault();
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("images");
-        localStorage.removeItem("portfolioId");
-        localStorage.removeItem("layouts");
+        localStorage.clear();
+
+        dispatch(setPortfolioId(null));
         dispatch(setIsAuth(false));
+        dispatch(setUser(null));
+        dispatch(setUserId(null));
 
         alert("logout!!");
         navigate("/");

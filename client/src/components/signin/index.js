@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setIsSign } from "../../features/triggerSlice";
-import { setIsAuth } from "../../features/userSlice";
+import { setUserId, setUser, setIsAuth } from "../../features/userSlice";
 
 import axios from "axios";
 
@@ -26,13 +26,17 @@ const Signin = () => {
             });
 
             if (status === 200) {
-                const { token } = data;
+                const { id, token } = data;
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", email);
+                localStorage.setItem("userId", id);
+                localStorage.setItem("isAuth", true);
 
                 alert("Login !!!");
                 dispatch(setIsSign(false));
                 dispatch(setIsAuth(true));
+                dispatch(setUserId(id));
+                dispatch(setUser(email));
                 navigate("/profile");
             }
         } catch (error) {
@@ -130,7 +134,7 @@ const Signin = () => {
                             name="email"
                             id="email"
                             required
-                            defaultValue={"jane23@fake.com"}
+                            defaultValue={"jane456@fake.com"}
                             placeholder="email"
                             className="form-input col-start-6 col-span-6 py-1 indent-4 border-2 border-solid border-black rounded-xl focus:outline-none"
                         />
