@@ -56,7 +56,7 @@ route.post("/signin", async (req, res) => {
         return res.status(404).send("User no Found");
     }
 
-    const { password: foundPassword } = foundUser;
+    const { id, password: foundPassword } = foundUser;
 
     // Load hash from your password DB.
     bcrypt.compare(password, foundPassword, (err, isMatch) => {
@@ -75,6 +75,7 @@ route.post("/signin", async (req, res) => {
 
             // token = "JWT " + token
             return res.status(200).send({
+                id,
                 token: "JWT " + token,
             });
         } else {
