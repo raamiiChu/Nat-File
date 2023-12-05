@@ -37,6 +37,10 @@ const BoardItem = ({ image }) => {
     const [boardIndex, setBoardIndex] = useState(() => {
         const layouts = JSON.parse(localStorage.getItem("layouts"));
 
+        if (!layouts) {
+            return;
+        }
+
         const foundLayout = layouts["lg"].filter((layout) => {
             return layout.i === id;
         });
@@ -123,13 +127,7 @@ const BoardItem = ({ image }) => {
 
     return (
         <div className={`${boardStyles[boardIndex]}`}>
-            <div
-                className="not-draggable"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    alert(123);
-                }}
-            >
+            <div>
                 <img
                     src={`https://stylish-images-storage.s3.ap-northeast-1.amazonaws.com/${s3Key}`}
                     alt={title}
@@ -151,7 +149,7 @@ const BoardItem = ({ image }) => {
                 <FaRegTrashAlt className="mx-auto" />
             </button>
 
-            <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 px-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
+            <nav className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-x-2 px-4 py-1.5 rounded-lg bg-black bg-opacity-50 text-white transition-all hover:opacity-100 cursor-default">
                 {scaleBtns.map((scaleBtn, index) => {
                     const { icon, w, h } = scaleBtn;
 
@@ -162,7 +160,7 @@ const BoardItem = ({ image }) => {
                                 index === boardIndex
                                     ? "bg-white text-black"
                                     : "bg-black text-white"
-                            } w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg hover:bg-white hover:text-black`}
+                            } w-7 h-7 flex justify-center items-center rounded-lg hover:bg-white hover:text-black`}
                             onClick={(e) => {
                                 scale(e, id, w, h);
                                 setBoardIndex(index);

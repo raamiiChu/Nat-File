@@ -41,7 +41,7 @@ const Board = () => {
 
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
-    const { isAuth } = useSelector((state) => state.userSlice);
+    const { user, isAuth } = useSelector((state) => state.userSlice);
     const { portfolioId, layouts, images } = useSelector(
         (state) => state.portfolioSlice
     );
@@ -54,8 +54,6 @@ const Board = () => {
 
     // trigger by save btn
     const saveToDatabase = async (e) => {
-        const user = localStorage.getItem("user");
-
         try {
             const res = await axios.post(`${backendUrl}/portfolio/save`, {
                 id: portfolioId,
@@ -81,8 +79,6 @@ const Board = () => {
 
     // set layouts & images from db to local storage ( if exist )
     const loadFromDatabase = async () => {
-        const user = localStorage.getItem("user");
-
         try {
             const { data: portfolio } = await axios.post(
                 `${backendUrl}/portfolio/load`,
