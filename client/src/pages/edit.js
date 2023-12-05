@@ -1,18 +1,21 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useSelector } from "react-redux";
+
 import { ChartContainer, Board, UploadImage } from "../components/edit";
 
 import axios from "axios";
 
 const Edit = () => {
     const navigate = useNavigate();
+    const { backendUrl } = useSelector((state) => state.urlSlice);
 
     const checkUser = async () => {
         const token = localStorage.getItem("token");
 
         try {
-            await axios.get("http://localhost:3001/auth", {
+            await axios.get(`${backendUrl}/auth`, {
                 headers: { Authorization: token },
             });
         } catch (error) {
