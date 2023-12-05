@@ -7,6 +7,7 @@ import { setPortfolioId } from "../features/portfolioSlice";
 import axios from "axios";
 
 import { MdOutlineModeEdit } from "react-icons/md";
+import { FaRegTrashAlt } from "react-icons/fa";
 import imageNotFound from "../images/image-not-found.jpg";
 
 const Profile = () => {
@@ -50,9 +51,33 @@ const Profile = () => {
 
     const toEditPage = (e, portfolioId) => {
         e.preventDefault();
+
+        // set portfolioId, then go to edit page
         localStorage.setItem("portfolioId", portfolioId);
         dispatch(setPortfolioId(portfolioId));
         navigate("/edit");
+    };
+
+    const deletePortfolio = async (e, portfolioId, images) => {
+        e.preventDefault();
+
+        try {
+            await axios.delete(`${backendUrl}/portfolio/delete/${portfolioId}`);
+
+            for (const image of images) {
+                const { s3Key } = image;
+                await axios.delete(`${backendUrl}/images/${s3Key}`);
+            }
+
+            setPortfolios(
+                portfolios.filter((portfolio) => {
+                    return portfolio.id !== portfolioId;
+                })
+            );
+            alert("Delete Successfully!");
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     useEffect(() => {
@@ -114,6 +139,15 @@ const Profile = () => {
                             }}
                         >
                             <MdOutlineModeEdit className="w-6 h-6" />
+                        </Link>
+
+                        <Link
+                            className="opacity-0 group-hover:opacity-100 absolute -top-3 -right-3 w-12 h-12 flex justify-center items-center border-2 border-solid border-black border-opacity-40 rounded-full bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                            onClick={(e) => {
+                                deletePortfolio(e, portfolioId, images);
+                            }}
+                        >
+                            <FaRegTrashAlt className="w-6 h-6" />
                         </Link>
                     </div>
                 );
