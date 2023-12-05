@@ -126,11 +126,9 @@ const Board = () => {
                     className="layout col-span-full"
                     layouts={layouts}
                     breakpoints={{
-                        lg: 720,
-                        md: 480,
-                        sm: 320,
+                        lg: 0,
                     }}
-                    cols={{ lg: 6, md: 4, sm: 2 }}
+                    cols={{ lg: 6 }}
                     resizeHandles={[]}
                     margin={[20, 50]}
                     containerPadding={[20, 20]}
