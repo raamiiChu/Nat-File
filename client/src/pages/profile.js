@@ -6,9 +6,22 @@ import { setPortfolioId } from "../features/portfolioSlice";
 
 import axios from "axios";
 
+import Swal from "sweetalert2";
+
 import { MdOutlineModeEdit } from "react-icons/md";
 import { FaRegTrashAlt } from "react-icons/fa";
 import imageNotFound from "../images/image-not-found.jpg";
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -74,7 +87,11 @@ const Profile = () => {
                     return portfolio.id !== portfolioId;
                 })
             );
-            alert("Delete Successfully!");
+
+            Toast.fire({
+                icon: "success",
+                title: "Delete Successfully!",
+            });
         } catch (error) {
             console.log(error);
         }

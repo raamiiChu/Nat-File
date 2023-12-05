@@ -9,6 +9,8 @@ import { setPortfolioId } from "../../features/portfolioSlice";
 
 import { FaBars } from "react-icons/fa";
 
+import Swal from "sweetalert2";
+
 const Header = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -34,7 +36,12 @@ const Header = () => {
         dispatch(setUser(null));
         dispatch(setUserId(null));
 
-        alert("logout!!");
+        Swal.fire({
+            icon: "success",
+            title: "Bye!",
+            text: "Log Out Success",
+        });
+
         navigate("/");
     };
 

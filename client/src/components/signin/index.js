@@ -7,6 +7,8 @@ import { setUserId, setUser, setIsAuth } from "../../features/userSlice";
 
 import axios from "axios";
 
+import Swal from "sweetalert2";
+
 const Signin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -32,7 +34,12 @@ const Signin = () => {
                 localStorage.setItem("userId", id);
                 localStorage.setItem("isAuth", true);
 
-                alert("Login !!!");
+                Swal.fire({
+                    icon: "success",
+                    title: "Welcome!",
+                    text: "Redirecting to Your Profile Page",
+                });
+
                 dispatch(setIsSign(false));
                 dispatch(setIsAuth(true));
                 dispatch(setUserId(id));
@@ -44,12 +51,20 @@ const Signin = () => {
 
             // wrong email or password
             if (status === 403) {
-                alert("email or password is not correct");
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Wrong Email or Password",
+                });
             }
 
             // user no found
             if (status === 404) {
-                alert("Please sign up first");
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Please Sign Up First",
+                });
             }
         }
     };
@@ -74,16 +89,24 @@ const Signin = () => {
 
             signIn(email, password);
         } catch (error) {
-            const { status, data } = error.response;
-
-            // user no found
-            if (status === 404) {
-                alert(data);
-            }
+            const { status } = error.response;
 
             // wrong email or password
             if (status === 403) {
-                alert(data);
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Wrong Email or Password",
+                });
+            }
+
+            // user no found
+            if (status === 404) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Please Sign Up First",
+                });
             }
 
             // user exists
