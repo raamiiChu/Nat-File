@@ -11,7 +11,7 @@ import { IoSquareOutline } from "react-icons/io5";
 import { GoSquare } from "react-icons/go";
 import { FaRegTrashAlt } from "react-icons/fa";
 
-const boardStyles = ["board-small", "board-long", "board-tall", "border-big"];
+const boardStyles = ["board-small", "board-long", "board-tall", "board-big"];
 
 const scaleBtns = [
     { icon: <GoSquare />, w: 1, h: 1 },
@@ -120,7 +120,7 @@ const BoardItem = ({ image }) => {
                 };
             }
 
-            dispatch(setLayouts(updatedLayouts));
+            dispatch(setLayouts(JSON.parse(JSON.stringify(updatedLayouts))));
             localStorage.setItem("layouts", JSON.stringify(layouts));
         }
     };
@@ -131,7 +131,6 @@ const BoardItem = ({ image }) => {
                 <img
                     src={`https://stylish-images-storage.s3.ap-northeast-1.amazonaws.com/${s3Key}`}
                     alt={title}
-                    className="object-contain object-center rounded-xl"
                 />
             </div>
             <article>

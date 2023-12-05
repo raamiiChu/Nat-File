@@ -147,7 +147,7 @@ const Board = () => {
                         return (
                             <div
                                 key={id}
-                                className="group relative p-3 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
+                                className="group relative p-3 border-2 border-solid border-black border-opacity-50 rounded-3xl shadow-lg bg-white cursor-grab active:cursor-grabbing"
                             >
                                 <BoardItem image={image} />
                             </div>
