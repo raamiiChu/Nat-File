@@ -58,7 +58,7 @@ const Header = () => {
 
                     return (
                         <Link
-                            key={index}
+                            key={`laptop-links-${index}`}
                             to={navLink[1]}
                             className="hover:opacity-75"
                         >
@@ -111,7 +111,7 @@ const Header = () => {
                 {navLinks.map((navLink, index) => {
                     return (
                         <Link
-                            key={index}
+                            key={`mobile-links-${index}`}
                             to={navLink[1]}
                             className="hover:opacity-75"
                         >
