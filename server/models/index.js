@@ -5,6 +5,6 @@ User.hasMany(Portfolio);
 Portfolio.belongsTo(User);
 
 await User.sync({ alter: true });
-await Portfolio.sync({ force: true });
+await Portfolio.sync({ alter: true });
 
 export { User, Portfolio };
