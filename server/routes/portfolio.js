@@ -6,6 +6,7 @@ route.use((req, res, next) => {
     next();
 });
 
+// save portfolio by portfolio id
 route.post("/save", async (req, res) => {
     try {
         const { id, images, layouts } = req.body;
@@ -17,10 +18,12 @@ route.post("/save", async (req, res) => {
     }
 });
 
+// load portfolio by portfolio id
 route.post("/load", async (req, res) => {
     let { id, email } = req.body;
 
     try {
+        // if no id given, create a new portfolio
         if (!id) {
             const foundUser = await User.findOne({ where: { email } });
             const newPortfolio = await Portfolio.create({
@@ -49,6 +52,7 @@ route.post("/load", async (req, res) => {
     }
 });
 
+// get all portfolio by user id
 route.get("/loadAll/:id", async (req, res) => {
     const { id } = req.params;
 
@@ -62,6 +66,18 @@ route.get("/loadAll/:id", async (req, res) => {
         return res.status(200).send(rawData);
     } catch (error) {
         return res.status(500).send(error);
+    }
+});
+
+// delete portfolio by portfolio id
+route.delete("/delete/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await Portfolio.destroy({ where: { id } });
+        return res.status(200).send("Delete");
+    } catch (error) {
+        return res.status(500).send("Failed");
     }
 });
 
