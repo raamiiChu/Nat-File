@@ -144,7 +144,8 @@ const Signin = () => {
                 }}
             >
                 <div className="p-4">
-                    <h2 className="text-xl font-bold">Welcome!</h2>
+                    <h2 className="text-2xl font-bold">Welcome!</h2>
+                    <hr className="my-3 border" />
                     <p className="text-base">
                         Sign in to access your account or sign up to join.
                     </p>
@@ -170,7 +171,7 @@ const Signin = () => {
                             required
                             defaultValue={"jane456@fake.com"}
                             placeholder="email"
-                            className="form-input col-start-6 col-span-6 py-1 indent-4 border-2 border-solid border-black rounded-xl focus:outline-none"
+                            className="form-input col-start-6 col-span-6 py-1 indent-4 border border-solid border-black rounded-lg focus:outline-none"
                         />
                     </section>
 
@@ -188,7 +189,7 @@ const Signin = () => {
                             required
                             defaultValue={"123ASDspdo$"}
                             placeholder="password"
-                            className="form-input col-start-6 col-span-6 py-1 indent-4 border-2 border-solid border-black rounded-xl focus:outline-none"
+                            className="form-input col-start-6 col-span-6 py-1 indent-4 border border-solid border-black rounded-lg focus:outline-none"
                             onFocus={(e) => {
                                 e.target.type = "text";
                             }}
@@ -201,7 +202,7 @@ const Signin = () => {
                     <div className="grid grid-cols-12 mt-2">
                         <button
                             type="submit"
-                            className="form-input col-start-3 col-span-3 p-1 border border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
+                            className="form-input col-start-3 col-span-3 p-1 border-2 border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign Up");
                             }}
@@ -211,7 +212,7 @@ const Signin = () => {
 
                         <button
                             type="submit"
-                            className="form-input col-start-8 col-span-3 p-1 border border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-white transition-all duration-300"
+                            className="form-input col-start-8 col-span-3 p-1 border-2 border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign In");
                             }}
