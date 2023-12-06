@@ -7,8 +7,6 @@ route.use((req, res, next) => {
 });
 
 route.get("/", (req, res) => {
-    console.log(req.user);
-    console.log(req.isAuthenticated());
     res.send("ok");
 });
 

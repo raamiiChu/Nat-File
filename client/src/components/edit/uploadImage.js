@@ -59,6 +59,17 @@ const UploadImage = () => {
         formData.append("image", file);
 
         try {
+            Swal.fire({
+                icon: "info",
+                title: "Uploading Image",
+                text: "Please wait...",
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
             const { data: s3Key } = await axios.post(
                 `${backendUrl}/images/upload`,
                 formData,
@@ -66,6 +77,8 @@ const UploadImage = () => {
                     Headers: { "Content-Type": "multipart/form-data" },
                 }
             );
+
+            Swal.close();
 
             Toast.fire({
                 icon: "success",

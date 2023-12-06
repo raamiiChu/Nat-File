@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+    setPortfolioId,
     setLayout,
     setLayouts,
     setImages,
@@ -40,8 +41,11 @@ const Board = () => {
 
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
-
-    const { layouts, images } = useSelector((state) => state.portfolioSlice);
+    const { user, isAuth } = useSelector((state) => state.userSlice);
+    const { portfolioId, layouts, images } = useSelector(
+        (state) => state.portfolioSlice
+    );
+    const [isFirstTime, setIsFirstTime] = useState(true);
 
     // trigger on layout change
     const saveCurrLayout = (layouts) => {
@@ -51,44 +55,72 @@ const Board = () => {
 
     // trigger by save btn
     const saveToDatabase = async (e) => {
-        const res = await axios.post(`${backendUrl}/portfolio/save`, {
-            email: "jane23@fake.com",
-            layouts,
-            images,
-        });
-
-        if (!e) {
-            return;
-        }
-
-        if (res.status === 200) {
-            Toast.fire({
-                icon: "success",
-                title: "Your work has been saved",
+        try {
+            const res = await axios.post(`${backendUrl}/portfolio/save`, {
+                id: portfolioId,
+                email: user,
+                layouts,
+                images,
             });
+
+            if (!e) {
+                return;
+            }
+
+            if (res.status === 200) {
+                Toast.fire({
+                    icon: "success",
+                    title: "Your work has been saved",
+                });
+            }
+        } catch (error) {
+            console.log(error);
         }
     };
 
     // set layouts & images from db to local storage ( if exist )
     const loadFromDatabase = async () => {
-        const res = await axios.get(`${backendUrl}/portfolio/load`);
-        const portfolio = res.data.Portfolios;
+        try {
+            const { data: portfolio } = await axios.post(
+                `${backendUrl}/portfolio/load`,
+                {
+                    id: portfolioId,
+                    email: user,
+                }
+            );
 
-        if (portfolio.length !== 0) {
-            const { images, layouts } = portfolio[0];
+            const { id, images, layouts } = portfolio;
 
+            localStorage.setItem("portfolioId", JSON.stringify(id));
             localStorage.setItem("images", JSON.stringify(images));
             localStorage.setItem("layouts", JSON.stringify(layouts));
+
+            dispatch(setPortfolioId(id));
             dispatch(setImages(images));
             dispatch(setLayouts(layouts));
+        } catch (error) {
+            console.log(error);
         }
     };
 
     useEffect(() => {
+        if (!isAuth) {
+            return;
+        }
+
         loadFromDatabase();
+        setIsFirstTime(false);
     }, []);
 
     useEffect(() => {
+        if (!isAuth) {
+            return;
+        }
+
+        if (isFirstTime) {
+            return;
+        }
+
         localStorage.setItem("images", JSON.stringify(images));
         saveToDatabase();
     }, [images]);
@@ -100,11 +132,9 @@ const Board = () => {
                     className="layout col-span-full"
                     layouts={layouts}
                     breakpoints={{
-                        lg: 720,
-                        md: 480,
-                        sm: 320,
+                        lg: 0,
                     }}
-                    cols={{ lg: 6, md: 4, sm: 2 }}
+                    cols={{ lg: 6 }}
                     resizeHandles={[]}
                     margin={[20, 50]}
                     containerPadding={[20, 20]}
@@ -115,13 +145,13 @@ const Board = () => {
                         saveCurrLayout(layouts);
                     }}
                 >
-                    {images.map((image) => {
+                    {images?.map((image) => {
                         const { id } = image;
 
                         return (
                             <div
                                 key={id}
-                                className="group relative p-3 border border-solid border-black border-opacity-50 rounded-3xl bg-white cursor-grab active:cursor-grabbing"
+                                className="group relative p-3 border-2 border-solid border-black border-opacity-50 rounded-3xl shadow-lg bg-white cursor-grab active:cursor-grabbing"
                             >
                                 <BoardItem image={image} />
                             </div>

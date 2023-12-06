@@ -9,17 +9,17 @@ const opts = {
 
 passport.use(
     new JwtStrategy(opts, async function (jwt_payload, done) {
-        const { email, exp } = jwt_payload;
+        const { email } = jwt_payload;
 
         try {
             let foundUser = await User.findOne({
                 where: { email },
             });
 
-            // check if user exists and jwt is not expire
-            if (foundUser && exp > Date.now() / 1000) {
-                const { name, email } = foundUser;
-                return done(null, { name, email });
+            // check if user exists
+            if (foundUser) {
+                const { email } = foundUser;
+                return done(null, { email });
             } else {
                 return done(null, false);
             }

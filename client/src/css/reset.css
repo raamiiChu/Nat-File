@@ -147,13 +147,13 @@ body {
         @apply h-[130px];
     }
     .board-small div {
-        @apply h-5/6 flex justify-center items-center -mt-1 cursor-pointer;
+        @apply flex justify-center items-center -mt-1 cursor-pointer;
     }
     .board-small div img {
-        @apply rounded-xl;
+        @apply max-h-[100px] mx-auto object-contain rounded-xl;
     }
     .board-small article {
-        @apply absolute left-1/2 bottom-0 -translate-x-1/2 w-2/3;
+        @apply absolute left-1/2 bottom-1 -translate-x-1/2 w-2/3;
     }
     .board-small article h2 {
         @apply flex flex-nowrap justify-center overflow-hidden;
@@ -166,10 +166,13 @@ body {
     }
 
     .board-long {
-        @apply h-[120px] grid grid-cols-2 gap-x-4;
+        @apply grid grid-cols-2 gap-x-4 -mt-1;
     }
     .board-long div {
-        @apply h-full flex justify-center items-center cursor-pointer;
+        @apply flex justify-center items-center cursor-pointer;
+    }
+    .board-long div img {
+        @apply h-[120px] mx-auto object-contain rounded-3xl;
     }
 
     .board-long article {
@@ -189,10 +192,13 @@ body {
         @apply flex flex-col gap-y-2 px-2 py-4;
     }
     .board-tall div {
-        @apply max-h-[150px] flex items-center cursor-pointer;
+        @apply flex items-center cursor-pointer;
+    }
+    .board-tall img {
+        @apply max-h-[150px] mx-auto object-contain rounded-xl;
     }
     .board-tall article {
-        @apply grid gap-y-1.5;
+        @apply mt-2 grid gap-y-1.5;
     }
     .board-tall article h2 {
         @apply flex flex-nowrap overflow-hidden;
@@ -205,10 +211,13 @@ body {
     }
 
     .board-big {
-        @apply flex flex-col gap-y-2 px-2 py-4;
+        @apply flex flex-col gap-y-2;
     }
     .board-big div {
         @apply flex justify-center items-center cursor-pointer;
+    }
+    .board-big div img {
+        @apply max-h-[200px] mx-auto object-contain rounded-3xl;
     }
     .board-big article {
         @apply grid gap-y-1.5;

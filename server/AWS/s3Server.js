@@ -17,6 +17,7 @@ export async function uploadFile(file, uuid, currTime, name) {
         Bucket: BucketName,
         Body: fileStream,
         Key: `${uuid}-${currTime}-${name}`,
+        ContentType: "image/jpeg",
     };
 
     try {
@@ -33,22 +34,6 @@ export async function uploadFile(file, uuid, currTime, name) {
         return result.Key;
     } catch (err) {
         console.error("Error uploading file:", err);
-        throw err;
-    }
-}
-
-// downloads a file from s3
-export function downloadFile(fileKey) {
-    const params = {
-        Key: fileKey,
-        Bucket: BucketName,
-    };
-
-    try {
-        const result = s3.getObject(params).createReadStream();
-        return result;
-    } catch (err) {
-        console.error(`Error downloading file: ${fileKey}`, err);
         throw err;
     }
 }
@@ -70,4 +55,4 @@ export async function deleteFile(fileKey) {
     }
 }
 
-export default { uploadFile, downloadFile, deleteFile };
+export default { uploadFile, deleteFile };

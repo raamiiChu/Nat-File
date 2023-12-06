@@ -6,12 +6,14 @@ import { setLayouts, setImages } from "../../features/portfolioSlice";
 
 import axios from "axios";
 
+import Swal from "sweetalert2";
+
 import { LuRectangleVertical, LuRectangleHorizontal } from "react-icons/lu";
 import { IoSquareOutline } from "react-icons/io5";
 import { GoSquare } from "react-icons/go";
 import { FaRegTrashAlt } from "react-icons/fa";
 
-const boardStyles = ["board-small", "board-long", "board-tall", "border-big"];
+const boardStyles = ["board-small", "board-long", "board-tall", "board-big"];
 
 const scaleBtns = [
     { icon: <GoSquare />, w: 1, h: 1 },
@@ -19,6 +21,17 @@ const scaleBtns = [
     { icon: <LuRectangleVertical />, w: 1, h: 2 },
     { icon: <IoSquareOutline />, w: 2, h: 2 },
 ];
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
 
 const BoardItem = ({ image }) => {
     const { id, title, species, time, s3Key } = image;
@@ -29,13 +42,74 @@ const BoardItem = ({ image }) => {
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
 
-    const { layout, layouts, images } = useSelector(
-        (state) => state.portfolioSlice
-    );
+    const { layouts, images } = useSelector((state) => state.portfolioSlice);
 
     // state
-    const [boardIndex, setBoardIndex] = useState(() => {
-        const layouts = JSON.parse(localStorage.getItem("layouts"));
+    const [boardIndex, setBoardIndex] = useState(0);
+
+    // trigger by delete btn
+    const deleteImage = async (e, id, s3Key) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showConfirmButton: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "Delete",
+        }).then(async (result) => {
+            if (result.isDenied) {
+                await axios.delete(`${backendUrl}/images/${s3Key}`);
+
+                Toast.fire({
+                    icon: "success",
+                    title: "Your image has been deleted",
+                });
+
+                dispatch(
+                    setImages(
+                        images.filter((image) => {
+                            return image.id !== id;
+                        })
+                    )
+                );
+            }
+        });
+    };
+
+    // trigger by scale btns
+    const scale = (e, key, width = 1, height = 1) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Create a deep copy of the layouts
+        const updatedLayouts = JSON.parse(JSON.stringify(layouts));
+        const layoutIndex = layouts.lg.findIndex(
+            (item) => item.i === String(key)
+        );
+
+        if (layoutIndex !== -1) {
+            // Update the specific layout item's width
+            if (updatedLayouts.lg) {
+                updatedLayouts.lg[layoutIndex] = {
+                    ...updatedLayouts.lg[layoutIndex],
+                    w: width,
+                    h: height,
+                };
+            }
+
+            dispatch(setLayouts(updatedLayouts));
+            localStorage.setItem("layouts", JSON.stringify(layouts));
+        }
+    };
+
+    const determineIndex = () => {
+        if (!layouts) {
+            return 0;
+        }
 
         const foundLayout = layouts["lg"].filter((layout) => {
             return layout.i === id;
@@ -61,79 +135,19 @@ const BoardItem = ({ image }) => {
             // first time upload image
             return 0;
         }
-    });
-
-    // trigger by delete btn
-    const deleteImage = async (e, id, s3Key) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        await axios.delete(`${backendUrl}/images/${s3Key}`);
-
-        dispatch(
-            setImages(
-                images.filter((image) => {
-                    return image.id !== id;
-                })
-            )
-        );
     };
 
-    // trigger by scale btns
-    const scale = (e, key, width = 1, height = 1) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Create a deep copy of the layouts
-        const updatedLayouts = JSON.parse(JSON.stringify(layouts));
-        const layoutIndex = layout.findIndex((item) => item.i === String(key));
-        console.log(layoutIndex);
-        if (layoutIndex !== -1) {
-            // Update the specific layout item's width
-            if (updatedLayouts.lg) {
-                updatedLayouts.lg[layoutIndex] = {
-                    ...updatedLayouts.lg[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            // Assuming there's an 'md' array in your layouts state, update it as well
-            if (updatedLayouts.md) {
-                updatedLayouts.md[layoutIndex] = {
-                    ...updatedLayouts.md[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            // Assuming there's an 'sm' array in your layouts state, update it as well
-            if (updatedLayouts.sm) {
-                updatedLayouts.sm[layoutIndex] = {
-                    ...updatedLayouts.sm[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            dispatch(setLayouts(updatedLayouts));
-            localStorage.setItem("layouts", JSON.stringify(layouts));
-        }
-    };
+    useEffect(() => {
+        const index = determineIndex();
+        setBoardIndex(index);
+    }, [layouts]);
 
     return (
         <div className={`${boardStyles[boardIndex]}`}>
-            <div
-                className="not-draggable"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    alert(123);
-                }}
-            >
+            <div>
                 <img
-                    src={`${backendUrl}/images/${s3Key}`}
+                    src={`https://stylish-images-storage.s3.ap-northeast-1.amazonaws.com/${s3Key}`}
                     alt={title}
-                    className="object-contain object-center rounded-xl"
                 />
             </div>
             <article>
@@ -151,7 +165,7 @@ const BoardItem = ({ image }) => {
                 <FaRegTrashAlt className="mx-auto" />
             </button>
 
-            <nav className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 flex justify-center gap-x-2 px-2 py-1.5 rounded-lg bg-black text-white transition-all hover:opacity-100 cursor-default">
+            <nav className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-x-2 px-4 py-1.5 rounded-lg bg-black bg-opacity-50 text-white transition-all hover:opacity-100 cursor-default">
                 {scaleBtns.map((scaleBtn, index) => {
                     const { icon, w, h } = scaleBtn;
 
@@ -162,7 +176,7 @@ const BoardItem = ({ image }) => {
                                 index === boardIndex
                                     ? "bg-white text-black"
                                     : "bg-black text-white"
-                            } w-7 h-7 flex justify-center items-center border border-solid border-white rounded-lg hover:bg-white hover:text-black`}
+                            } w-7 h-7 flex justify-center items-center rounded-lg hover:bg-white hover:text-black`}
                             onClick={(e) => {
                                 scale(e, id, w, h);
                                 setBoardIndex(index);

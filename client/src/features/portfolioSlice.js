@@ -20,6 +20,7 @@ const initImages = () => {
 };
 
 const initialState = {
+    portfolioId: localStorage.getItem("portfolioId") || null,
     layout: [],
     layouts: initLayouts(),
     images: initImages(),
@@ -29,6 +30,10 @@ export const portfolioSlice = createSlice({
     name: "portfolio",
     initialState,
     reducers: {
+        setPortfolioId: (state, action) => {
+            state.portfolioId = action.payload;
+        },
+
         setLayout: (state, action) => {
             state.layout = action.payload;
         },
@@ -43,6 +48,7 @@ export const portfolioSlice = createSlice({
     },
 });
 
-export const { setLayout, setLayouts, setImages } = portfolioSlice.actions;
+export const { setPortfolioId, setLayout, setLayouts, setImages } =
+    portfolioSlice.actions;
 
 export default portfolioSlice.reducer;
