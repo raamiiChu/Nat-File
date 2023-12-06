@@ -6,6 +6,8 @@ import { setLayouts, setImages } from "../../features/portfolioSlice";
 
 import axios from "axios";
 
+import Swal from "sweetalert2";
+
 import { LuRectangleVertical, LuRectangleHorizontal } from "react-icons/lu";
 import { IoSquareOutline } from "react-icons/io5";
 import { GoSquare } from "react-icons/go";
@@ -19,6 +21,17 @@ const scaleBtns = [
     { icon: <LuRectangleVertical />, w: 1, h: 2 },
     { icon: <IoSquareOutline />, w: 2, h: 2 },
 ];
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 1000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
 
 const BoardItem = ({ image }) => {
     const { id, title, species, time, s3Key } = image;
@@ -39,15 +52,32 @@ const BoardItem = ({ image }) => {
         e.stopPropagation();
         e.preventDefault();
 
-        await axios.delete(`${backendUrl}/images/${s3Key}`);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showConfirmButton: false,
+            showCancelButton: true,
+            showDenyButton: true,
+            denyButtonText: "Delete",
+        }).then(async (result) => {
+            if (result.isDenied) {
+                await axios.delete(`${backendUrl}/images/${s3Key}`);
 
-        dispatch(
-            setImages(
-                images.filter((image) => {
-                    return image.id !== id;
-                })
-            )
-        );
+                Toast.fire({
+                    icon: "success",
+                    title: "Your image has been deleted",
+                });
+
+                dispatch(
+                    setImages(
+                        images.filter((image) => {
+                            return image.id !== id;
+                        })
+                    )
+                );
+            }
+        });
     };
 
     // trigger by scale btns
