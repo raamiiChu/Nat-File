@@ -11,6 +11,17 @@ import { FaBars } from "react-icons/fa";
 
 import Swal from "sweetalert2";
 
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 2000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
+
 const Header = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -36,7 +47,7 @@ const Header = () => {
         dispatch(setUser(null));
         dispatch(setUserId(null));
 
-        Swal.fire({
+        Toast.fire({
             icon: "success",
             title: "Bye!",
             text: "Log Out Success",

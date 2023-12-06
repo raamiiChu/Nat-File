@@ -9,6 +9,17 @@ import axios from "axios";
 
 import Swal from "sweetalert2";
 
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 2000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
+
 const Signin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -34,10 +45,10 @@ const Signin = () => {
                 localStorage.setItem("userId", id);
                 localStorage.setItem("isAuth", true);
 
-                Swal.fire({
+                Toast.fire({
                     icon: "success",
-                    title: "Welcome!",
-                    text: "Redirecting to Your Profile Page",
+                    title: "Welcome",
+                    text: "Redirect to Your Profile Page",
                 });
 
                 dispatch(setIsSign(false));
