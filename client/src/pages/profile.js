@@ -71,30 +71,43 @@ const Profile = () => {
         navigate("/edit");
     };
 
-    const deletePortfolio = async (e, portfolioId, images) => {
+    const deletePortfolio = (e, portfolioId, images) => {
         e.preventDefault();
 
-        try {
-            await axios.delete(`${backendUrl}/portfolio/delete/${portfolioId}`);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+        }).then(async (result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                try {
+                    await axios.delete(
+                        `${backendUrl}/portfolio/delete/${portfolioId}`
+                    );
 
-            for (const image of images) {
-                const { s3Key } = image;
-                await axios.delete(`${backendUrl}/images/${s3Key}`);
+                    for (const image of images) {
+                        const { s3Key } = image;
+                        await axios.delete(`${backendUrl}/images/${s3Key}`);
+                    }
+
+                    setPortfolios(
+                        portfolios.filter((portfolio) => {
+                            return portfolio.id !== portfolioId;
+                        })
+                    );
+
+                    Toast.fire({
+                        icon: "success",
+                        title: "Delete Successfully!",
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
             }
-
-            setPortfolios(
-                portfolios.filter((portfolio) => {
-                    return portfolio.id !== portfolioId;
-                })
-            );
-
-            Toast.fire({
-                icon: "success",
-                title: "Delete Successfully!",
-            });
-        } catch (error) {
-            console.log(error);
-        }
+        });
     };
 
     useEffect(() => {
