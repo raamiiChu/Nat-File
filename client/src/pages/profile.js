@@ -78,11 +78,12 @@ const Profile = () => {
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
+            showConfirmButton: false,
             showCancelButton: true,
-            confirmButtonText: "Delete",
+            showDenyButton: true,
+            denyButtonText: "Delete",
         }).then(async (result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
+            if (result.isDenied) {
                 try {
                     await axios.delete(
                         `${backendUrl}/portfolio/delete/${portfolioId}`
@@ -164,6 +165,7 @@ const Profile = () => {
 
                         <Link
                             className="opacity-0 group-hover:opacity-100 absolute -top-3 -left-3 w-12 h-12 flex justify-center items-center border-2 border-solid border-black border-opacity-40 rounded-full bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                            title="Edit"
                             onClick={(e) => {
                                 toEditPage(e, portfolioId);
                             }}
@@ -173,6 +175,7 @@ const Profile = () => {
 
                         <Link
                             className="opacity-0 group-hover:opacity-100 absolute -top-3 -right-3 w-12 h-12 flex justify-center items-center border-2 border-solid border-black border-opacity-40 rounded-full bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                            title="Delete"
                             onClick={(e) => {
                                 deletePortfolio(e, portfolioId, images);
                             }}
