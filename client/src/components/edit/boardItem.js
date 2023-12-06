@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -29,16 +29,56 @@ const BoardItem = ({ image }) => {
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
 
-    const { layout, layouts, images } = useSelector(
-        (state) => state.portfolioSlice
-    );
+    const { layouts, images } = useSelector((state) => state.portfolioSlice);
 
     // state
-    const [boardIndex, setBoardIndex] = useState(() => {
-        const layouts = JSON.parse(localStorage.getItem("layouts"));
+    const [boardIndex, setBoardIndex] = useState(0);
 
+    // trigger by delete btn
+    const deleteImage = async (e, id, s3Key) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        await axios.delete(`${backendUrl}/images/${s3Key}`);
+
+        dispatch(
+            setImages(
+                images.filter((image) => {
+                    return image.id !== id;
+                })
+            )
+        );
+    };
+
+    // trigger by scale btns
+    const scale = (e, key, width = 1, height = 1) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Create a deep copy of the layouts
+        const updatedLayouts = JSON.parse(JSON.stringify(layouts));
+        const layoutIndex = layouts.lg.findIndex(
+            (item) => item.i === String(key)
+        );
+
+        if (layoutIndex !== -1) {
+            // Update the specific layout item's width
+            if (updatedLayouts.lg) {
+                updatedLayouts.lg[layoutIndex] = {
+                    ...updatedLayouts.lg[layoutIndex],
+                    w: width,
+                    h: height,
+                };
+            }
+
+            dispatch(setLayouts(updatedLayouts));
+            localStorage.setItem("layouts", JSON.stringify(layouts));
+        }
+    };
+
+    const determineIndex = () => {
         if (!layouts) {
-            return;
+            return 0;
         }
 
         const foundLayout = layouts["lg"].filter((layout) => {
@@ -65,65 +105,12 @@ const BoardItem = ({ image }) => {
             // first time upload image
             return 0;
         }
-    });
-
-    // trigger by delete btn
-    const deleteImage = async (e, id, s3Key) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        await axios.delete(`${backendUrl}/images/${s3Key}`);
-
-        dispatch(
-            setImages(
-                images.filter((image) => {
-                    return image.id !== id;
-                })
-            )
-        );
     };
 
-    // trigger by scale btns
-    const scale = (e, key, width = 1, height = 1) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Create a deep copy of the layouts
-        const updatedLayouts = JSON.parse(JSON.stringify(layouts));
-        const layoutIndex = layout.findIndex((item) => item.i === String(key));
-
-        if (layoutIndex !== -1) {
-            // Update the specific layout item's width
-            if (updatedLayouts.lg) {
-                updatedLayouts.lg[layoutIndex] = {
-                    ...updatedLayouts.lg[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            // Assuming there's an 'md' array in your layouts state, update it as well
-            if (updatedLayouts.md) {
-                updatedLayouts.md[layoutIndex] = {
-                    ...updatedLayouts.md[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            // Assuming there's an 'sm' array in your layouts state, update it as well
-            if (updatedLayouts.sm) {
-                updatedLayouts.sm[layoutIndex] = {
-                    ...updatedLayouts.sm[layoutIndex],
-                    w: width,
-                    h: height,
-                };
-            }
-
-            dispatch(setLayouts(JSON.parse(JSON.stringify(updatedLayouts))));
-            localStorage.setItem("layouts", JSON.stringify(layouts));
-        }
-    };
+    useEffect(() => {
+        const index = determineIndex();
+        setBoardIndex(index);
+    }, [layouts]);
 
     return (
         <div className={`${boardStyles[boardIndex]}`}>

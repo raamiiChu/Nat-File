@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -45,6 +45,7 @@ const Board = () => {
     const { portfolioId, layouts, images } = useSelector(
         (state) => state.portfolioSlice
     );
+    const [isFirstTime, setIsFirstTime] = useState(true);
 
     // trigger on layout change
     const saveCurrLayout = (layouts) => {
@@ -108,10 +109,15 @@ const Board = () => {
         }
 
         loadFromDatabase();
+        setIsFirstTime(false);
     }, []);
 
     useEffect(() => {
         if (!isAuth) {
+            return;
+        }
+
+        if (isFirstTime) {
             return;
         }
 
