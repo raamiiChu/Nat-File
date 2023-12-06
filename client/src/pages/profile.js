@@ -120,7 +120,7 @@ const Profile = () => {
         <div className="grid grid-col-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 mx-6 lg:mx-12 sm:mx-16 my-5">
             <h2 className="col-span-full my-3 text-center text-xl font-bold tracking-wider">
                 <Link
-                    className="px-2 sm:px-6 py-1.5 sm:py-2.5 border-2 border-black border-solid rounded-3xl bg-white text-black hover:text-white hover:bg-black transition-all duration-300"
+                    className="px-2 sm:px-6 py-1.5 sm:py-2.5 border-2 border-black border-solid rounded-xl bg-white text-black hover:text-primary hover:bg-black transition-all duration-300"
                     onClick={(e) => {
                         toEditPage(e, null);
                     }}
