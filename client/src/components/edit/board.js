@@ -98,6 +98,8 @@ const Board = () => {
             dispatch(setPortfolioId(id));
             dispatch(setImages(images));
             dispatch(setLayouts(layouts));
+
+            setIsFirstTime(false);
         } catch (error) {
             console.log(error);
         }
@@ -109,7 +111,6 @@ const Board = () => {
         }
 
         loadFromDatabase();
-        setIsFirstTime(false);
     }, []);
 
     useEffect(() => {
@@ -129,7 +130,7 @@ const Board = () => {
         <section className="relative grid grid-cols-12 bg-white bg-opacity-20 h-[700px]">
             <div className="lg:col-start-2 col-span-full lg:col-span-10 grid grid-cols-12 mx-5 lg:mx-0 my-auto p-2 border-4 border-solid border-black border-opacity-[33%] rounded-2xl bg-white bg-opacity-[85%] h-[550px] overflow-y-scroll">
                 <ResponsiveGridLayout
-                    className="layout col-span-full"
+                    className="layout col-span-full min-w-[1200px] "
                     layouts={layouts}
                     breakpoints={{
                         lg: 0,
