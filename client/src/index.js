@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import "./css/reset.css";
+import "./css/tailwind.css";
+
 import App from "./App.js";
 
 import { BrowserRouter } from "react-router-dom";
