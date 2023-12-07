@@ -12,6 +12,8 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
+import { FaFileUpload } from "react-icons/fa";
+
 import Swal from "sweetalert2";
 
 const Toast = Swal.mixin({
@@ -117,15 +119,16 @@ const UploadImage = () => {
             }}
         >
             <div
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 bg-white text-center"
+                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 sm:w-9/12 lg:w-4/12 grid gap-y-5 mx-auto py-5 bg-white text-center rounded-3xl"
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
             >
-                <h2 className="text-xl py-3">Upload Your Image</h2>
+                <h2 className="text-xl font-bold">Upload Your Image</h2>
+                <hr className="w-10/12 mx-auto border-2" />
                 <form
                     action="POST"
-                    className="w-11/12 lg:w-9/12 mx-auto flex flex-col justify-center gap-y-2"
+                    className="w-11/12 lg:w-9/12 mx-auto flex flex-col justify-center gap-y-4"
                     onSubmit={(e) => {
                         addImage(e);
                     }}
@@ -138,6 +141,7 @@ const UploadImage = () => {
                             id="title"
                             className="form-input border-2 border-black rounded-md focus:outline-none"
                             required
+                            maxLength={15}
                             onChange={(e) => {
                                 setTitle(e.target.value);
                             }}
@@ -146,25 +150,54 @@ const UploadImage = () => {
 
                     <div className="flex justify-between">
                         <label htmlFor="species">Species</label>
-                        <input
-                            type="text"
+                        <select
                             name="species"
                             id="species"
-                            className="form-input border-2 border-black rounded-md focus:outline-none"
+                            className="form-input w-5/12 border-2 border-black rounded-md"
+                            defaultValue={"未知"}
                             required
                             onChange={(e) => {
                                 setSpecies(e.target.value);
                             }}
-                        />
+                        >
+                            <option value="大分類" disabled>
+                                大分類
+                            </option>
+                            <hr />
+                            <option value="未知">未知</option>
+                            <option value="原生動物">原生動物</option>
+                            <option value="真菌">真菌</option>
+                            <option value="植物">植物</option>
+
+                            <option value="魚類">魚類</option>
+                            <option value="兩棲類">兩棲類</option>
+                            <option value="爬蟲類">爬蟲類</option>
+                            <option value="鳥類">鳥類</option>
+                            <option value="哺乳類">哺乳類</option>
+
+                            <option value="藻類">藻類</option>
+                            <option value="軟體動物">軟體動物</option>
+                            <option value="節肢動物">節肢動物</option>
+                            <option value="昆蟲">昆蟲</option>
+                            <option value="蛛形綱">蛛形綱</option>
+
+                            <option value="其它動物">其它動物</option>
+                        </select>
                     </div>
 
-                    <div className="flex justify-between">
-                        <label htmlFor="image">Image</label>
+                    <div className="flex justify-center">
+                        <label
+                            htmlFor="image"
+                            className="w-8/12 grid gap-y-1.5 p-2 border-2 border-solid border-black rounded-2xl cursor-pointer hover:text-primary hover:bg-black transition-all duration-300"
+                        >
+                            <FaFileUpload className="w-6 h-6 mx-auto" />
+                            {file ? file?.name : "Maximum Size: 10 MB"}
+                        </label>
                         <input
                             type="file"
                             name="image"
                             id="image"
-                            className="form-input border-2 border-black rounded-md focus:outline-none"
+                            className="form-input inline w-[1px] h-[1px]"
                             required
                             onChange={(e) => {
                                 setTime(
