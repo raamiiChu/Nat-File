@@ -1,30 +1,167 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { Chart } from "react-google-charts";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
+import { useSelector } from "react-redux";
+
+import { PieChart, Pie, Sector, ResponsiveContainer, Cell } from "recharts";
 
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-const ChartContainer = () => {
-    const data = [
-        { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
-        { name: "Page B", uv: 800, pv: 2000, amt: 5000 },
-    ];
+const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#F1092A",
+    "#c4ffe4",
+];
 
-    const divRef = useRef(null);
-    const [dimensions, setDimensions] = useState({
-        width: 0,
-        height: 0,
-    });
+const renderActiveShape = (props) => {
+    const RADIAN = Math.PI / 180;
+    const {
+        cx,
+        cy,
+        midAngle,
+        innerRadius,
+        outerRadius,
+        startAngle,
+        endAngle,
+        fill,
+        payload,
+        percent,
+        value,
+    } = props;
+    const sin = Math.sin(-RADIAN * midAngle);
+    const cos = Math.cos(-RADIAN * midAngle);
+    const sx = cx + (outerRadius + 10) * cos;
+    const sy = cy + (outerRadius + 10) * sin;
+    const mx = cx + (outerRadius + 30) * cos;
+    const my = cy + (outerRadius + 30) * sin;
+    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+    const ey = my;
+    const textAnchor = cos >= 0 ? "start" : "end";
+
+    return (
+        <g>
+            <text x={cx} y={cy} dy={8} textAnchor="middle" fill={"#FFEAA1"}>
+                {payload.name}
+            </text>
+            <Sector
+                cx={cx}
+                cy={cy}
+                innerRadius={innerRadius}
+                outerRadius={outerRadius}
+                startAngle={startAngle}
+                endAngle={endAngle}
+                fill={fill}
+            />
+            <Sector
+                cx={cx}
+                cy={cy}
+                startAngle={startAngle}
+                endAngle={endAngle}
+                innerRadius={outerRadius + 6}
+                outerRadius={outerRadius + 10}
+                fill={fill}
+            />
+            <path
+                d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+                stroke={fill}
+                fill="none"
+            />
+            <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+            <text
+                x={ex + (cos >= 0 ? 1 : -1) * 12}
+                y={ey}
+                textAnchor={textAnchor}
+                fill="#FFF"
+            >{`${payload.name}: ${value}`}</text>
+            <text
+                x={ex + (cos >= 0 ? 1 : -1) * 12}
+                y={ey}
+                dy={18}
+                textAnchor={textAnchor}
+                fill="#999"
+            >
+                {`(${(percent * 100).toFixed(1)}%)`}
+            </text>
+        </g>
+    );
+};
+
+const ChartContainer = () => {
+    const { images } = useSelector((state) => state.portfolioSlice);
+
+    const [showPie, setShowPie] = useState(true);
+    const [scrollY, setScrollY] = useState(0);
+    const [dataTime, setDataTime] = useState([]);
+    const [dataSpecies, setDataSpecies] = useState([]);
+
+    const pieRef = useRef(null);
+
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [activeIndex2, setActiveIndex2] = useState(0);
+
+    const onPieEnter = (_, index) => {
+        setActiveIndex(index);
+    };
+
+    const onPieEnter2 = (_, index) => {
+        setActiveIndex2(index);
+    };
+    const handleScroll = () => {
+        setScrollY(window.scrollY);
+    };
 
     useEffect(() => {
-        if (divRef.current?.offsetHeight && divRef.current?.offsetWidth) {
-            setDimensions({
-                width: divRef.current.offsetWidth,
-                height: divRef.current.offsetHeight,
-            });
-        }
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
     }, []);
+
+    useEffect(() => {
+        const allTimes = {};
+        const allSpecies = {};
+
+        for (const image of images) {
+            const { time, species } = image;
+
+            const date = new Date(time);
+            const formattedDate = `${date.getFullYear()} / ${
+                date.getMonth() + 1
+            } / ${date.getDate()}`;
+            if (!allTimes[formattedDate]) {
+                allTimes[formattedDate] = 1;
+            } else {
+                allTimes[formattedDate] += 1;
+            }
+
+            if (!allSpecies[species]) {
+                allSpecies[species] = 1;
+            } else {
+                allSpecies[species] += 1;
+            }
+        }
+
+        const newDataTime = Object.entries(allTimes).map(([key, value]) => {
+            return { name: key, value };
+        });
+
+        const newDataSpecies = Object.entries(allSpecies).map(
+            ([key, value]) => {
+                return { name: key, value };
+            }
+        );
+
+        setDataTime(newDataTime);
+        setDataSpecies(newDataSpecies);
+    }, [images]);
+
+    useEffect(() => {
+        const height = pieRef.current?.current?.offsetHeight;
+        setShowPie(height < scrollY / 2 + 50);
+    }, [scrollY]);
 
     return (
         <section className="pt-10 sm:pt-12 lg:pt-16 bg-black text-white">
@@ -46,24 +183,43 @@ const ChartContainer = () => {
                             itaque nisi quibusdam quod,
                         </p>
 
-                        <div
-                            ref={divRef}
-                            className="col-start-2 col-span-10 flex justify-center h-[200px] "
-                        >
-                            <LineChart
-                                width={dimensions.width}
-                                height={dimensions.height}
-                                data={data}
+                        <div className="col-start-2 col-span-10 flex justify-center h-[350px] ">
+                            <ResponsiveContainer
+                                ref={pieRef}
+                                width={"100%"}
+                                height={"100%"}
                             >
-                                <Line
-                                    type="monotone"
-                                    dataKey="uv"
-                                    stroke="#8884d8"
-                                />
-                                <CartesianGrid stroke="#ccc" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                            </LineChart>
+                                {showPie && (
+                                    <PieChart>
+                                        <Pie
+                                            activeIndex={activeIndex}
+                                            activeShape={renderActiveShape}
+                                            data={dataTime}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={75}
+                                            outerRadius={100}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            onMouseEnter={(e, index) => {
+                                                onPieEnter(e, index);
+                                            }}
+                                        >
+                                            {dataTime.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={
+                                                        COLORS[
+                                                            index %
+                                                                COLORS.length
+                                                        ]
+                                                    }
+                                                />
+                                            ))}
+                                        </Pie>
+                                    </PieChart>
+                                )}
+                            </ResponsiveContainer>
                         </div>
                     </section>
 
@@ -75,22 +231,39 @@ const ChartContainer = () => {
                             itaque nisi quibusdam quod,
                         </p>
 
-                        <div className="col-start-2 col-span-10 border border-solid border-white">
-                            <Chart
-                                chartType="PieChart"
-                                data={[
-                                    ["Task", "Hours per Day"],
-                                    ["Work", 11],
-                                    ["Eat", 2],
-                                    ["Commute", 2],
-                                    ["Watch TV", 2],
-                                    ["Sleep", 7],
-                                ]}
-                                options={{
-                                    title: "My Daily Activities",
-                                }}
-                                className=""
-                            />
+                        <div className="col-start-2 col-span-10 flex justify-center h-[350px] ">
+                            <ResponsiveContainer width={"100%"} height={"100%"}>
+                                {showPie && (
+                                    <PieChart>
+                                        <Pie
+                                            activeIndex={activeIndex2}
+                                            activeShape={renderActiveShape}
+                                            data={dataSpecies}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={75}
+                                            outerRadius={100}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            onMouseEnter={(e, index) => {
+                                                onPieEnter2(e, index);
+                                            }}
+                                        >
+                                            {dataSpecies.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={
+                                                        COLORS[
+                                                            index %
+                                                                COLORS.length
+                                                        ]
+                                                    }
+                                                />
+                                            ))}
+                                        </Pie>
+                                    </PieChart>
+                                )}
+                            </ResponsiveContainer>
                         </div>
                     </section>
                 </div>
