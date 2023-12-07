@@ -151,9 +151,9 @@ const BoardItem = ({ image }) => {
                 />
             </div>
             <article>
-                <h2>Name: {title}</h2>
-                <p>Time: {time}</p>
-                <h3>Species: {species}</h3>
+                <h2>{title}</h2>
+                <p>{time}</p>
+                <h3>{species}</h3>
             </article>
 
             <button

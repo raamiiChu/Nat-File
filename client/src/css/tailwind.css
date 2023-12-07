@@ -16,7 +16,7 @@
         @apply absolute left-1/2 bottom-1 -translate-x-1/2 w-3/4;
     }
     .board-small article h2 {
-        @apply flex flex-nowrap justify-center overflow-hidden whitespace-nowrap;
+        @apply flex flex-nowrap justify-center tracking-wider whitespace-nowrap overflow-hidden;
     }
     .board-small article p {
         @apply hidden;
@@ -39,7 +39,7 @@
         @apply my-auto;
     }
     .board-long article h2 {
-        @apply flex flex-nowrap overflow-hidden;
+        @apply flex flex-nowrap text-lg tracking-widest overflow-hidden;
     }
     .board-long article p {
         @apply block mb-3 text-xs;
@@ -58,20 +58,20 @@
         @apply max-h-[150px] mx-auto object-contain rounded-xl;
     }
     .board-tall article {
-        @apply mt-2 grid gap-y-1.5;
+        @apply mt-2 grid gap-y-2;
     }
     .board-tall article h2 {
-        @apply flex flex-nowrap overflow-hidden;
+        @apply flex flex-nowrap text-lg tracking-widest overflow-hidden;
     }
     .board-tall article p {
-        @apply text-xs;
+        @apply text-xs -mt-1.5;
     }
     .board-tall article h3 {
         @apply text-sm;
     }
 
     .board-big {
-        @apply flex flex-col gap-y-2;
+        @apply flex flex-col gap-y-3;
     }
     .board-big div {
         @apply flex justify-center items-center cursor-pointer;
@@ -80,10 +80,10 @@
         @apply max-h-[200px] mx-auto object-contain rounded-3xl;
     }
     .board-big article {
-        @apply grid gap-y-1.5;
+        @apply ml-3 grid gap-y-1.5;
     }
     .board-big article h2 {
-        @apply flex flex-nowrap overflow-hidden;
+        @apply flex flex-nowrap text-xl tracking-widest overflow-hidden;
     }
     .board-big article p {
         @apply text-xs;
