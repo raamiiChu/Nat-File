@@ -52,7 +52,7 @@ const BoardItem = ({ image }) => {
         e.stopPropagation();
         e.preventDefault();
 
-        Swal.fire({
+        const result = await Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
@@ -60,24 +60,24 @@ const BoardItem = ({ image }) => {
             showCancelButton: true,
             showDenyButton: true,
             denyButtonText: "Delete",
-        }).then(async (result) => {
-            if (result.isDenied) {
-                await axios.delete(`${backendUrl}/images/${s3Key}`);
-
-                Toast.fire({
-                    icon: "success",
-                    title: "Your image has been deleted",
-                });
-
-                dispatch(
-                    setImages(
-                        images.filter((image) => {
-                            return image.id !== id;
-                        })
-                    )
-                );
-            }
         });
+
+        if (result.isDenied) {
+            await axios.delete(`${backendUrl}/images/${s3Key}`);
+
+            Toast.fire({
+                icon: "success",
+                title: "Your image has been deleted",
+            });
+
+            dispatch(
+                setImages(
+                    images.filter((image) => {
+                        return image.id !== id;
+                    })
+                )
+            );
+        }
     };
 
     // trigger by scale btns
