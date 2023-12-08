@@ -46,6 +46,12 @@ const UploadImage = () => {
     const [file, setFile] = useState("");
     const [time, setTime] = useState("");
 
+    const fileInputHandler = (e) => {
+        setTime(e.target.files[0]?.lastModifiedDate.toDateString());
+
+        setFile(e.target.files[0]);
+    };
+
     // trigger after form been submitted
     const addImage = async (e) => {
         // check the form
@@ -133,13 +139,35 @@ const UploadImage = () => {
                         addImage(e);
                     }}
                 >
+                    <div className="flex justify-center">
+                        <label
+                            htmlFor="image"
+                            className="w-8/12 grid gap-y-1.5 p-1.5 border border-solid border-black rounded-2xl cursor-pointer hover:text-primary hover:bg-black transition-all duration-300"
+                        >
+                            <FaFileUpload className="w-6 h-6 mx-auto" />
+                            {file ? file?.name : "Maximum Size: 10 MB"}
+                        </label>
+                        <input
+                            type="file"
+                            name="image"
+                            id="image"
+                            className="form-input inline w-[1px] h-[1px]"
+                            required
+                            onChange={(e) => {
+                                fileInputHandler(e);
+                            }}
+                        />
+                    </div>
+
                     <div className="flex justify-between">
-                        <label htmlFor="title">Title</label>
+                        <label htmlFor="title" className="w-full text-left p-1">
+                            Title
+                        </label>
                         <input
                             type="text"
                             name="title"
                             id="title"
-                            className="form-input border-2 border-black rounded-md focus:outline-none"
+                            className="form-input py-1 border border-black rounded-md indent-2"
                             required
                             maxLength={15}
                             onChange={(e) => {
@@ -149,11 +177,16 @@ const UploadImage = () => {
                     </div>
 
                     <div className="flex justify-between">
-                        <label htmlFor="species">Species</label>
+                        <label
+                            htmlFor="species"
+                            className="w-full text-left p-1"
+                        >
+                            Species
+                        </label>
                         <select
                             name="species"
                             id="species"
-                            className="form-input w-5/12 border-2 border-black rounded-md"
+                            className="form-input p-1 w-1/2 border border-black rounded-md"
                             defaultValue={"未知"}
                             required
                             onChange={(e) => {
@@ -163,7 +196,7 @@ const UploadImage = () => {
                             <option value="大分類" disabled>
                                 大分類
                             </option>
-                            <hr />
+                            <hr disabled />
                             <option value="未知">未知</option>
                             <option value="原生動物">原生動物</option>
                             <option value="真菌">真菌</option>
@@ -185,37 +218,28 @@ const UploadImage = () => {
                         </select>
                     </div>
 
-                    <div className="flex justify-center">
-                        <label
-                            htmlFor="image"
-                            className="w-8/12 grid gap-y-1.5 p-2 border-2 border-solid border-black rounded-2xl cursor-pointer hover:text-primary hover:bg-black transition-all duration-300"
-                        >
-                            <FaFileUpload className="w-6 h-6 mx-auto" />
-                            {file ? file?.name : "Maximum Size: 10 MB"}
-                        </label>
-                        <input
-                            type="file"
-                            name="image"
-                            id="image"
-                            className="form-input inline w-[1px] h-[1px]"
-                            required
-                            onChange={(e) => {
-                                setTime(
-                                    e.target.files[0]?.lastModifiedDate.toDateString()
-                                );
+                    <hr className="border-2" />
 
-                                setFile(e.target.files[0]);
+                    <div className="grid grid-cols-2 gap-5 px-4">
+                        <button
+                            type="reset"
+                            className="px-3 py-1 rounded-full bg-gray-300 hover:bg-black hover:text-primary disabled:cursor-progress disabled:opacity-20 disabled:bg-black disabled:text-white transition-all duration-300"
+                            disabled={isConnectingS3}
+                            onClick={() => {
+                                setFile(null);
                             }}
-                        />
-                    </div>
+                        >
+                            Reset
+                        </button>
 
-                    <button
-                        type="submit"
-                        className={`px-3 py-1 border border-solid border-black rounded-full hover:bg-black hover:text-white disabled:cursor-progress disabled:opacity-20 disabled:bg-black disabled:text-white`}
-                        disabled={isConnectingS3}
-                    >
-                        Submit
-                    </button>
+                        <button
+                            type="submit"
+                            className="px-3 py-1 border-2 border-solid border-black rounded-full hover:bg-black hover:text-primary disabled:cursor-progress disabled:opacity-20 disabled:bg-black disabled:text-white transition-all duration-300"
+                            disabled={isConnectingS3}
+                        >
+                            Submit
+                        </button>
+                    </div>
                 </form>
             </div>
         </section>
