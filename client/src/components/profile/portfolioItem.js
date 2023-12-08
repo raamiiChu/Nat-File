@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import { format } from "date-fns";
+
 import { MdOutlineModeEdit } from "react-icons/md";
 import { FaRegTrashAlt } from "react-icons/fa";
 import imageNotFound from "../../images/image-not-found.jpg";
@@ -29,9 +31,19 @@ const PortfolioItem = ({ userId, portfolio, toEditPage, deletePortfolio }) => {
             </section>
 
             <article className="col-span-full">
-                <h3>Images: {images.length}</h3>
-                <p>Created At: {createdAt}</p>
-                <p>Update At: {updatedAt}</p>
+                <h3 className="text-lg">Images: {images.length}</h3>
+                <p className="flex items-center justify-end gap-x-2 mt-2 text-sm">
+                    <span>Created At</span>
+                    <span>
+                        {format(new Date(createdAt), "yyyy / MM / dd hh:mm")}
+                    </span>
+                </p>
+                <p className="flex items-center justify-end gap-x-2 text-sm">
+                    <span>Updated At</span>
+                    <span>
+                        {format(new Date(updatedAt), "yyyy / MM / dd hh:mm")}
+                    </span>
+                </p>
             </article>
 
             <Link
