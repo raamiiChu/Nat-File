@@ -133,9 +133,7 @@ const Header = () => {
                             to={navLink[1]}
                             className="hover:opacity-75"
                         >
-                            <li className="py-2.5" key={index}>
-                                {navLink[0]}
-                            </li>
+                            <li className="py-2.5">{navLink[0]}</li>
                         </Link>
                     );
                 })}
