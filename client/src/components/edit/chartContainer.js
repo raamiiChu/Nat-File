@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { useSelector } from "react-redux";
 
+import { format } from "date-fns";
+
 import { PieChart, Pie, Sector, ResponsiveContainer, Cell } from "recharts";
 
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
@@ -91,7 +93,7 @@ const renderActiveShape = (props) => {
 const ChartContainer = () => {
     const { images } = useSelector((state) => state.portfolioSlice);
 
-    const [showPie, setShowPie] = useState(false);
+    const [showPie, setShowPie] = useState(true);
     const [scrollY, setScrollY] = useState(0);
     const [dataTime, setDataTime] = useState([]);
     const [dataSpecies, setDataSpecies] = useState([]);
@@ -128,9 +130,7 @@ const ChartContainer = () => {
             const { time, species } = image;
 
             const date = new Date(time);
-            const formattedDate = `${date.getFullYear()} / ${
-                date.getMonth() + 1
-            } / ${date.getDate()}`;
+            const formattedDate = format(new Date(date), "yyyy / MM / dd");
             if (!allTimes[formattedDate]) {
                 allTimes[formattedDate] = 1;
             } else {
@@ -160,7 +160,7 @@ const ChartContainer = () => {
 
     useEffect(() => {
         const height = pieRef.current?.current?.offsetHeight;
-        setShowPie(height < scrollY / 2 + 50);
+        // setShowPie(height < scrollY / 2 + 50);
     }, [scrollY]);
 
     return (
@@ -224,7 +224,7 @@ const ChartContainer = () => {
                         </div>
                     </section>
 
-                    <section className="hidden lg:grid grid-cols-12 gap-y-6">
+                    <section className="grid grid-cols-12 gap-y-6">
                         <p className="col-span-full">
                             Lorem ipsum dolor sit amet consectetur, adipisicing
                             elit. Eligendi eveniet labore repellendus

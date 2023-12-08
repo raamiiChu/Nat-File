@@ -202,7 +202,7 @@ const Signin = () => {
                     <div className="grid grid-cols-12 mt-2">
                         <button
                             type="submit"
-                            className="form-input col-start-3 col-span-3 p-1 border-2 border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                            className="form-input col-start-3 col-span-3 p-1 rounded-3xl text-base bg-gray-300 hover:bg-black hover:text-primary transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign Up");
                             }}
