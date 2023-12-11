@@ -30,7 +30,7 @@ const Edit = () => {
     }, []);
 
     return (
-        <main className="relative bg-[url('../images/edit-bg.jpg')] bg-cover bg-no-repeat bg-top">
+        <main className="pt-16 relative bg-fixed bg-[url('../images/edit-bg.jpg')] bg-cover bg-no-repeat bg-top">
             <Board />
 
             <UploadImage />

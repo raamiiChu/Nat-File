@@ -115,7 +115,7 @@ const Profile = () => {
     }, []);
 
     return (
-        <div className="grid grid-col-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 mx-6 lg:mx-12 sm:mx-16 my-5">
+        <div className="grid grid-col-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 px-6 pt-32 pb-16 bg-black lg:px-12 sm:px-16">
             <CreateNewPortfolio toEditPage={toEditPage} />
 
             {portfolios?.map((portfolio) => {

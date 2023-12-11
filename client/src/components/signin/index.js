@@ -138,7 +138,7 @@ const Signin = () => {
             }}
         >
             <div
-                className="w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 text-center bg-white rounded-lg shadow-lg"
+                className="w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 text-center bg-gradient-to-b from-white to-slate-200 rounded-lg shadow-lg"
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
@@ -202,7 +202,7 @@ const Signin = () => {
                     <div className="grid grid-cols-12 mt-2">
                         <button
                             type="submit"
-                            className="form-input col-start-3 col-span-3 p-1 rounded-3xl text-base bg-gray-300 hover:bg-black hover:text-primary transition-all duration-300"
+                            className="form-input col-start-3 col-span-3 p-1 rounded-3xl text-base bg-gray bg-opacity-30 hover:bg-black hover:text-primary transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign Up");
                             }}

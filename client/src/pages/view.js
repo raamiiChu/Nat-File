@@ -1,173 +1,187 @@
-import React, { useState, useEffect } from "react";
-import gsap from "gsap";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
+import Globe from "react-globe.gl";
 
-import * as THREE from "three";
-import earthMap from "../images/earth.jpg";
+import { EarthInfoBox } from "../components/earth";
 
-const vertexShader = `
-varying vec2 vertexUV;
-varying vec3 vertexNormal;
+import axios from "axios";
 
-void main() {
-    vertexUV = uv;
-    vertexNormal = normalize(normalMatrix * normal);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-const fragmentShader = `
-uniform sampler2D earthTexture;
-
-varying vec2 vertexUV;
-varying vec3 vertexNormal;
-
-void main() {
-    float intensity = 1.05 - dot(vertexNormal, vec3(0.0, 0.0, 1.0));
-    vec3 atmosphere = vec3(0.3, 0.6, 1) * pow(intensity, 1.0);
-
-    gl_FragColor = vec4(atmosphere + texture2D(earthTexture, vertexUV).xyz, 1);
-}
-`;
-
-const atmosphereVertexShader = `
-varying vec3 atmosphereVertexNormal;
-
-void main() {
-    atmosphereVertexNormal = normalize(normalMatrix * normal);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.9);
-}
-`;
-
-const atmosphereFragmentShader = `
-varying vec3 atmosphereVertexNormal;
-
-void main() {
-    float intensity = pow(0.15 - dot(atmosphereVertexNormal, vec3(0, 0, 1.0)) - 0.1, 2.0);
-
-    gl_FragColor = vec4(0.3, 0.6, 1.0, 0.35) * intensity;
-}
-`;
+import Swal from "sweetalert2";
 
 const View = () => {
-    // const handleMouse = (e) => {
-    //     setMouseX((e.clientX / window.innerWidth) * 2 - 1);
-    //     setMouseY((e.clientY / window.innerHeight) * 2 - 1);
+    const globeDiv = useRef(null);
 
-    //     mouse.x = (e.clientX / width) * 2 - 1;
-    //     mouse.y = (e.clientY / height) * 2 - 1;
-    // };
-    // const [mouseX, setMouseX] = useState(null);
-    // const [mouseY, setMouseY] = useState(null);
+    const [perPage, setPerPage] = useState(100);
+    const [locationData, setLocationData] = useState([]);
+
+    const getNatData = async () => {
+        Swal.fire({
+            icon: "info",
+            title: "Fetching Data Now",
+            text: "Please wait...",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+
+        try {
+            const { status, data } = await axios.get(
+                `https://api.inaturalist.org/v1/observations?photos=true&sounds=false&licensed=true&photo_licensed=true&license=cc-by-nc&photo_license=cc-by-nc&per_page=${perPage}&order=desc&order_by=created_at`
+            );
+
+            if (status === 200) {
+                const locations = [];
+                const { results } = data;
+
+                for (const result of results) {
+                    try {
+                        const { uri, user, taxon, observation_photos } = result;
+
+                        const { coordinates } = result.geojson;
+                        const { name, preferred_common_name } = taxon;
+                        const mainImage =
+                            observation_photos[0].photo.url.replace(
+                                "square",
+                                "medium"
+                            );
+
+                        locations.push({
+                            name,
+                            preferredCommonName: preferred_common_name,
+                            user: user.login,
+                            lat: coordinates[1],
+                            lng: coordinates[0],
+                            size: 30,
+                            color: ["red", "white", "blue", "green"][
+                                Math.round(Math.random() * 3)
+                            ],
+                            url: uri,
+                            mainImage,
+                        });
+                    } catch (error) {}
+                }
+                console.log(locations);
+                setLocationData(locations);
+            }
+        } catch (error) {}
+
+        Swal.close();
+    };
 
     useEffect(() => {
-        const width = 1080;
-        const height = 720;
+        getNatData();
+    }, []);
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            70,
-            width / height,
-            0.01,
-            10
-        );
+    return (
+        <div className="group grid grid-cols-12 pt-16">
+            <form
+                className="group-hover:opacity-100 opacity-0 fixed w-[30%] bottom-7 left-5 z-30 grid grid-cols-12 p-3 bg-white border border-solid border-black rounded-xl transition-all duration-300"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    getNatData();
+                }}
+            >
+                <div className="col-start-4 col-span-6 grid grid-cols-2 gap-5 px-4">
+                    <div className="col-span-full flex justify-around">
+                        <label htmlFor="perPage">per page: </label>
+                        <input
+                            type="number"
+                            name="perPage"
+                            id="perPage"
+                            min={1}
+                            max={200}
+                            value={perPage}
+                            className="text-center border border-solid border-black"
+                            onChange={(e) => {
+                                let newPage;
+                                newPage = Math.max(1, e.target.value);
+                                newPage = Math.min(e.target.value, 200);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(window.devicePixelRatio);
+                                setPerPage(newPage);
+                            }}
+                        />
+                    </div>
 
-        const earthDiv = document.getElementById("earth");
-        earthDiv.appendChild(renderer.domElement);
+                    <button
+                        type="reset"
+                        className="p-0.5 rounded-full bg-gray-300 hover:bg-black hover:text-primary transition-all duration-300"
+                    >
+                        Reset
+                    </button>
+                    <button
+                        type="submit"
+                        className="p-0.5 border-2 border-solid border-black rounded-full hover:bg-black hover:text-primary transition-all duration-300"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </form>
 
-        // create a earth
-        const earth = new THREE.Mesh(
-            new THREE.SphereGeometry(5, 50, 50),
-            new THREE.ShaderMaterial({
-                vertexShader,
-                fragmentShader,
-                uniforms: {
-                    earthTexture: {
-                        value: new THREE.TextureLoader().load(earthMap),
-                    },
-                },
-            })
-        );
+            <div
+                ref={globeDiv}
+                className="col-span-full max-h-[650px] cursor-grab active:cursor-grabbing"
+            >
+                <Globe
+                    width={globeDiv.current?.offsetWidth}
+                    height={globeDiv.current?.offsetHeight}
+                    globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+                    bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+                    atmosphereAltitude={0.3}
+                    htmlElementsData={locationData}
+                    htmlElement={(data) => {
+                        const {
+                            name,
+                            preferredCommonName,
+                            user,
+                            color,
+                            size,
+                            url,
+                            mainImage,
+                        } = data;
 
-        scene.add(earth);
+                        const el = document.createElement("div");
 
-        // create atmosphere
-        const atmosphere = new THREE.Mesh(
-            new THREE.SphereGeometry(5, 50, 50),
-            new THREE.ShaderMaterial({
-                vertexShader: atmosphereVertexShader,
-                fragmentShader: atmosphereFragmentShader,
-                blending: THREE.AdditiveBlending,
-            })
-        );
+                        const markerSvg = `
+                    <svg viewBox="-4 0 36 36">
+                        <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
+                        <circle fill="black" cx="14" cy="14" r="7"></circle>
+                    </svg>
+                `;
+                        el.innerHTML = markerSvg;
+                        el.style.color = color;
+                        el.style.width = `${size}px`;
+                        el.style.position = "relative";
 
-        atmosphere.scale.set(1.15, 1.15, 1.15);
+                        el.style["pointer-events"] = "auto";
+                        el.style.cursor = "pointer";
 
-        scene.add(atmosphere);
+                        el.onmouseenter = () => {
+                            const infoBox = document.createElement("div");
+                            ReactDOM.render(
+                                <EarthInfoBox
+                                    name={name}
+                                    preferredCommonName={preferredCommonName}
+                                    user={user}
+                                    url={url}
+                                    mainImage={mainImage}
+                                />,
+                                infoBox
+                            );
+                            el.appendChild(infoBox);
+                        };
 
-        const group = new THREE.Group();
-        group.add(earth);
-        scene.add(group);
+                        el.onmouseleave = () => {
+                            el.removeChild(el.lastChild);
+                        };
 
-        const starGeometry = new THREE.BufferGeometry();
-        const starMaterial = new THREE.PointsMaterial({ color: "#FFFFFF" });
-
-        const starVertices = [];
-        for (let i = 0; i < 10000; i++) {
-            const x = (Math.random() - 0.5) * 2000;
-            const y = (Math.random() - 0.5) * 2000;
-            const z = -Math.random() * 1000;
-
-            starVertices.push(x, y, z);
-        }
-
-        starGeometry.setAttribute(
-            "position",
-            new THREE.Float32BufferAttribute(starVertices, 3)
-        );
-
-        const stars = new THREE.Points(starGeometry, starMaterial);
-
-        scene.add(stars);
-
-        // reset position of camera
-        // make sure the value should greater than 1st param of THREE.SphereGeometry()
-        camera.position.z = 12;
-        const mouse = { x: null, y: null };
-
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-            earth.rotation.y += 0.001;
-
-            gsap.to(group.rotation, {
-                x: mouse.y * 0.5,
-                y: mouse.x * 0.5,
-                duration: 1.2,
-            });
-        }
-
-        animate();
-
-        const handleMouse = (e) => {
-            // setMouseX((e.clientX / width) * 2 - 1);
-            // setMouseY((e.clientY / height) * 2 - 1);
-
-            mouse.x = (e.clientX / width) * 2 - 1;
-            mouse.y = (e.clientY / height) * 2 - 1;
-        };
-
-        earthDiv.addEventListener("mousemove", handleMouse);
-
-        return () => {
-            earthDiv.removeEventListener("mousemove", handleMouse);
-        };
-    });
-
-    return <div id="earth"></div>;
+                        return el;
+                    }}
+                />
+            </div>
+        </div>
+    );
 };
 
 export default View;

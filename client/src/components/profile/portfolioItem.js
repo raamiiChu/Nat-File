@@ -20,7 +20,7 @@ const PortfolioItem = ({ userId, portfolio, toEditPage, deletePortfolio }) => {
     return (
         <div
             key={`user-${userId}_portfolio-${portfolioId}`}
-            className="group relative grid grid-cols-12 gap-y-3 px-3 py-5 border-2 border-solid border-black border-opacity-50 rounded-3xl shadow-lg"
+            className="group relative grid grid-cols-12 gap-y-3 px-3 py-5 text-gray bg-white border-2 border-solid border-white border-opacity-50 rounded-3xl shadow-lg"
         >
             <section className="col-start-2 col-span-10">
                 <img
@@ -47,7 +47,7 @@ const PortfolioItem = ({ userId, portfolio, toEditPage, deletePortfolio }) => {
             </article>
 
             <Link
-                className="opacity-0 group-hover:opacity-100 absolute -top-3 -left-3 w-12 h-12 flex justify-center items-center border-2 border-solid border-black border-opacity-40 rounded-full bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                className="opacity-0 group-hover:opacity-100 absolute -top-3 -left-3 w-12 h-12 flex justify-center items-center border-e border-b border-solid border-black rounded-full bg-primary text-black hover:shadow-surrounding hover:shadow-slate-500 transition-all duration-300"
                 title="Edit"
                 onClick={(e) => {
                     toEditPage(e, portfolioId);
@@ -57,7 +57,7 @@ const PortfolioItem = ({ userId, portfolio, toEditPage, deletePortfolio }) => {
             </Link>
 
             <Link
-                className="opacity-0 group-hover:opacity-100 absolute -top-3 -right-3 w-12 h-12 flex justify-center items-center border-2 border-solid border-black border-opacity-40 rounded-full bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                className="opacity-0 group-hover:opacity-100 absolute -top-3 -right-3 w-12 h-12 flex justify-center items-center border-s border-b border-solid border-black rounded-full bg-white text-black hover:shadow-surrounding hover:shadow-red-500 transition-all duration-300"
                 title="Delete"
                 onClick={(e) => {
                     deletePortfolio(e, portfolioId, images);
