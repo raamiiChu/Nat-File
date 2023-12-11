@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLayouts, setImages } from "../../features/portfolioSlice";
 
 import axios from "axios";
+import { format } from "date-fns";
 
 import Swal from "sweetalert2";
 
@@ -34,7 +35,7 @@ const Toast = Swal.mixin({
 });
 
 const BoardItem = ({ image }) => {
-    const { id, title, species, time, s3Key } = image;
+    const { id, title, species, time, aperture, shutter, iso, s3Key } = image;
 
     // reducer
     const dispatch = useDispatch();
@@ -152,9 +153,23 @@ const BoardItem = ({ image }) => {
             </div>
             <article>
                 <h2>{title}</h2>
-                <p>{time}</p>
+                <p>{format(new Date(time), "yyyy / hh / mm")}</p>
                 <h3>{species}</h3>
             </article>
+
+            <hr />
+
+            <ul className="grid gap-y-1 text-sm">
+                <li>
+                    光圈 <br /> {aperture}
+                </li>
+                <li>
+                    快門 <br /> 1/{shutter}
+                </li>
+                <li>
+                    ISO <br /> {iso}
+                </li>
+            </ul>
 
             <button
                 className="absolute z-10 -left-5 -top-5 w-10 h-10 border border-solid border-black border-opacity-30 rounded-full shadow-2xl bg-white text-black opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
