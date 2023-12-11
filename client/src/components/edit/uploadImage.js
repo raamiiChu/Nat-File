@@ -11,6 +11,7 @@ import {
 
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import EXIF from "exif-js";
 
 import { FaFileUpload } from "react-icons/fa";
 
@@ -42,13 +43,35 @@ const UploadImage = () => {
 
     // form data
     const [title, setTitle] = useState("");
-    const [species, setSpecies] = useState("");
+    const [species, setSpecies] = useState("未知");
     const [file, setFile] = useState("");
     const [time, setTime] = useState("");
+    const [aperture, setAperture] = useState("");
+    const [shutter, setShutter] = useState("");
+    const [iso, setIso] = useState("");
+    const [focalLength, setFocalLength] = useState("");
 
     const fileInputHandler = (e) => {
-        setTime(e.target.files[0]?.lastModifiedDate.toDateString());
+        // if file exist, get full details
+        if (e.target.files[0]) {
+            EXIF.getData(e.target.files[0], function (e) {
+                const time = EXIF.getTag(this, "DateTimeOriginal");
+                const aperture = EXIF.getTag(this, "FNumber");
+                const shutter = EXIF.getTag(this, "ExposureTime");
+                const iso = EXIF.getTag(this, "ISOSpeedRatings") || "unknown";
+                const focalLength = EXIF.getTag(this, "FocalLength");
 
+                setAperture(
+                    aperture
+                        ? aperture.numerator / aperture.denominator
+                        : "unknown"
+                );
+                setShutter(shutter ? shutter.denominator : "unknown");
+                setIso(iso);
+                setTime(time ? time.split(" ")[0] : "2001:01:01");
+                setFocalLength(focalLength ? focalLength.numerator : "unknown");
+            });
+        }
         setFile(e.target.files[0]);
     };
 
@@ -100,7 +123,17 @@ const UploadImage = () => {
             dispatch(
                 setImages([
                     ...images,
-                    { id: uuidv4(), title, species, time, s3Key },
+                    {
+                        id: uuidv4(),
+                        title,
+                        species,
+                        time,
+                        aperture,
+                        shutter,
+                        iso,
+                        focalLength,
+                        s3Key,
+                    },
                 ])
             );
         } catch (error) {
@@ -223,7 +256,7 @@ const UploadImage = () => {
                     <div className="grid grid-cols-2 gap-5 px-4">
                         <button
                             type="reset"
-                            className="px-3 py-1 rounded-full bg-gray-300 hover:bg-black hover:text-primary disabled:cursor-progress disabled:opacity-20 disabled:bg-black disabled:text-white transition-all duration-300"
+                            className="px-3 py-1 rounded-full bg-gray bg-opacity-25 hover:bg-black hover:text-primary disabled:cursor-progress disabled:opacity-20 disabled:bg-black disabled:text-white transition-all duration-300"
                             disabled={isConnectingS3}
                             onClick={() => {
                                 setFile(null);
