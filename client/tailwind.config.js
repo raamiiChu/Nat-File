@@ -11,6 +11,7 @@ module.exports = {
                 gray: "#30353b",
             },
             boxShadow: {
+                blur: "0px 0px 4px 2px",
                 surrounding: "0px 0px 10px 5px",
             },
         },
