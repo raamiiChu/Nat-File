@@ -164,7 +164,7 @@ const UploadImage = () => {
                 }}
             >
                 <h2 className="text-xl font-bold">Upload Your Image</h2>
-                <hr className="w-10/12 mx-auto border-2" />
+                <hr className="w-10/12 mx-auto border-2 border-gray border-opacity-30" />
                 <form
                     action="POST"
                     className="w-11/12 lg:w-9/12 mx-auto flex flex-col justify-center gap-y-4"
@@ -251,7 +251,7 @@ const UploadImage = () => {
                         </select>
                     </div>
 
-                    <hr className="border-2" />
+                    <hr className="border-2 border-gray border-opacity-30" />
 
                     <div className="grid grid-cols-2 gap-5 px-4">
                         <button
