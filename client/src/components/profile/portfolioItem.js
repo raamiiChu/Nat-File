@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import { format } from "date-fns";
+import { format, formatDistance } from "date-fns";
 
 import { MdOutlineModeEdit } from "react-icons/md";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -82,15 +82,29 @@ const PortfolioItem = ({ userId, portfolio, toEditPage, deletePortfolio }) => {
             <article className="col-span-full">
                 <h3 className="text-lg">Images: {images.length}</h3>
                 <p className="flex items-center justify-end gap-x-2 mt-2 text-sm">
-                    <span>Created At</span>
-                    <span>
-                        {format(new Date(createdAt), "yyyy / MM / dd hh:mm")}
+                    <span>Created</span>
+                    <span
+                        title={format(
+                            new Date(createdAt),
+                            "yyyy / MM / dd hh:mm"
+                        )}
+                    >
+                        {formatDistance(new Date(createdAt), new Date(), {
+                            addSuffix: true,
+                        })}
                     </span>
                 </p>
                 <p className="flex items-center justify-end gap-x-2 text-sm">
-                    <span>Updated At</span>
-                    <span>
-                        {format(new Date(updatedAt), "yyyy / MM / dd hh:mm")}
+                    <span>Updated</span>
+                    <span
+                        title={format(
+                            new Date(updatedAt),
+                            "yyyy / MM / dd hh:mm"
+                        )}
+                    >
+                        {formatDistance(new Date(updatedAt), new Date(), {
+                            addSuffix: true,
+                        })}
                     </span>
                 </p>
             </article>
