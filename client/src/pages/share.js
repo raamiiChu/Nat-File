@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import axios from "axios";
 
 import { Board, OpenImage } from "../components/share";
-
 import { ChartContainer } from "../components/chart";
 
+import Swal from "sweetalert2";
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 4000,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
+
 const Share = () => {
+    const navigate = useNavigate();
+
     // redux
     const { backendUrl } = useSelector((state) => state.urlSlice);
     const { isOpeningImage } = useSelector((state) => state.shareSlice);
@@ -35,7 +49,12 @@ const Share = () => {
             const { status } = error.response;
 
             if (status === 404) {
-                console.log("no found");
+                Toast.fire({
+                    icon: "error",
+                    title: "Page can not find, redirect to homepage",
+                });
+
+                navigate("/");
             }
 
             if (status === 500) {
