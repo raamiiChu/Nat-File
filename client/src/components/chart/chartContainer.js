@@ -4,12 +4,13 @@ import { useSelector } from "react-redux";
 
 import { format } from "date-fns";
 
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-
 import Chart from "./chart";
 
-const ChartContainer = () => {
-    const { images } = useSelector((state) => state.portfolioSlice);
+const ChartContainer = ({ images }) => {
+    const { images: imagesFromRedux } = useSelector(
+        (state) => state.portfolioSlice
+    );
+    images = images || imagesFromRedux;
 
     const [dataTime, setDataTime] = useState([]);
     const [dataSpecies, setDataSpecies] = useState([]);
@@ -30,8 +31,6 @@ const ChartContainer = () => {
             const { time, species, aperture, shutter, iso, focalLength } =
                 image;
 
-            console.log(time);
-            console.log(new Date(time));
             const formattedDate = format(new Date(time), "yyyy / hh / mm");
             if (!allTimes[formattedDate]) {
                 allTimes[formattedDate] = 1;
@@ -45,7 +44,7 @@ const ChartContainer = () => {
                 allSpecies[species] += 1;
             }
 
-            const formattedAperture = `f ${aperture}`;
+            const formattedAperture = `f/${aperture}`;
             if (!allAperture[formattedAperture]) {
                 allAperture[formattedAperture] = 1;
             } else {
@@ -123,8 +122,8 @@ const ChartContainer = () => {
                 <hr className="col-span-3 border sm:border-2 border-primary" />
             </div>
 
-            <div className="relative group grid grid-cols-12 items-center py-16">
-                <div className="col-start-2 col-span-10 grid grid-cols-1 lg:grid-cols-2">
+            <div className="grid grid-cols-12 items-center py-16">
+                <div className="col-start-2 col-span-10 grid grid-cols-1 lg:grid-cols-2 gap-y-10">
                     <Chart title={"Time"} data={dataTime} />
                     <Chart title={"Species"} data={dataSpecies} />
                     <Chart title={"Aperture"} data={dataAperture} />
@@ -132,19 +131,6 @@ const ChartContainer = () => {
                     <Chart title={"ISO"} data={dataIso} />
                     <Chart title={"Focal Length"} data={dataFocalLength} />
                 </div>
-
-                {/* <button
-                    title="Previous"
-                    className="absolute hidden group-hover:block left-4 w-12 h-12 mx-auto text-black bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
-                >
-                    <FaArrowLeft className="mx-auto scale-150" />
-                </button>
-                <button
-                    title="Next"
-                    className="absolute hidden group-hover:block right-4 w-12 h-12 mx-auto text-black bg-primary rounded-full scale-75 sm:scale-90 lg:scale-100 opacity-50 hover:opacity-100 transition-all duration-300"
-                >
-                    <FaArrowRight className="mx-auto scale-150" />
-                </button> */}
             </div>
         </section>
     );

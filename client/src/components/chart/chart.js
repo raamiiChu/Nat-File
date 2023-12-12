@@ -91,7 +91,7 @@ const Chart = ({ title, data }) => {
     };
 
     return (
-        <section className="grid grid-cols-12 gap-y-6">
+        <section className="grid grid-cols-12 gap-y-2">
             <h2 className="col-span-full text-center text-2xl">{title}</h2>
 
             <div className="col-start-2 col-span-10 flex justify-center h-[350px] ">
@@ -128,6 +128,7 @@ const Chart = ({ title, data }) => {
                     }
                 </ResponsiveContainer>
             </div>
+            <hr className="col-start-2 col-span-10" />
         </section>
     );
 };
