@@ -72,6 +72,24 @@ route.get("/loadAll/:id", async (req, res) => {
     }
 });
 
+// get portfolio by public id
+route.get("/share/:publicId", async (req, res) => {
+    const { publicId } = req.params;
+    try {
+        const rawData = await Portfolio.findOne({
+            where: { publicId },
+        });
+
+        if (!rawData) {
+            return res.status(404).send("No Found");
+        }
+
+        return res.status(200).send(rawData);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+});
+
 // delete portfolio by portfolio id
 route.delete("/delete/:id", async (req, res) => {
     const { id } = req.params;
