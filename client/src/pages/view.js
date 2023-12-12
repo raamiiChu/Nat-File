@@ -75,7 +75,7 @@ const View = () => {
     }, []);
 
     return (
-        <div className="group grid grid-cols-12 pt-16">
+        <main className="group grid grid-cols-12 pt-16">
             <form
                 className="group-hover:opacity-100 opacity-0 fixed w-[30%] bottom-7 left-5 z-30 grid grid-cols-12 p-3 bg-white border border-solid border-black rounded-xl transition-all duration-300"
                 onSubmit={(e) => {
@@ -180,7 +180,7 @@ const View = () => {
                     }}
                 />
             </div>
-        </div>
+        </main>
     );
 };
 

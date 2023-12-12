@@ -138,7 +138,7 @@ const Signin = () => {
             }}
         >
             <div
-                className="w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 text-center bg-gradient-to-b from-white to-slate-200 rounded-lg shadow-lg"
+                className="w-11/12 sm:w-9/12 lg:w-4/12 mx-auto py-4 text-center bg-white rounded-lg shadow-lg"
                 onClick={(e) => {
                     e.stopPropagation();
                 }}

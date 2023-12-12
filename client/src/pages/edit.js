@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 
-import { ChartContainer, Board, UploadImage } from "../components/edit";
+import { Board, UploadImage } from "../components/edit";
+import { ChartContainer } from "../components/chart";
 
 import axios from "axios";
 

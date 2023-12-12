@@ -31,7 +31,6 @@ const Header = () => {
 
     const [showMenu, setShowMenu] = useState(false);
     const navLinks = [
-        ["About", "/about"],
         ["View", "/view"],
         ["Profile", "/profile"],
     ];
@@ -56,7 +55,7 @@ const Header = () => {
     };
 
     return (
-        <header className="fixed w-full top-0 z-50 grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest border-b-2 border-solid border-white">
+        <header className="fixed w-full top-0 z-50 grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest border-b-2 border-solid border-white border-opacity-60">
             {/* homepage link */}
             <Link
                 to="/"
@@ -69,7 +68,7 @@ const Header = () => {
             <ul className="col-span-6 lg:col-span-4 hidden sm:grid grid-cols-4 items-center text:lg lg:text-xl">
                 {navLinks.map((navLink, index) => {
                     // profile will not shown if user not sign in
-                    if (!isAuth && index >= 2) {
+                    if (!isAuth && index >= 1) {
                         return <div key={`mobile-links-${index}`}></div>;
                     }
 

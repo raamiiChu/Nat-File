@@ -132,7 +132,7 @@ const Earth = ({ width, height }) => {
         // reset position of camera
         // make sure the value should greater than 1st param of THREE.SphereGeometry()
         camera.position.z = 10;
-        camera.position.y = 6;
+        camera.position.y = 5;
         const mouse = { x: null, y: null };
 
         function animate() {

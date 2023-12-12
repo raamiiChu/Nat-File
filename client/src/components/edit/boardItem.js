@@ -112,7 +112,7 @@ const BoardItem = ({ image }) => {
             return 0;
         }
 
-        const foundLayout = layouts["lg"].filter((layout) => {
+        const foundLayout = layouts["lg"]?.filter((layout) => {
             return layout.i === id;
         });
 
