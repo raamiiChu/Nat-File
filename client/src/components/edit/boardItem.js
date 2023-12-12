@@ -180,7 +180,7 @@ const BoardItem = ({ image }) => {
                 <FaRegTrashAlt className="mx-auto" />
             </button>
 
-            <nav className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-x-2 px-4 py-1.5 rounded-lg bg-black bg-opacity-50 text-white transition-all hover:opacity-100 cursor-default">
+            <nav className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-x-2 px-4 py-1.5 rounded-lg bg-black bg-opacity-60 text-white transition-all hover:opacity-100 cursor-default">
                 {scaleBtns.map((scaleBtn, index) => {
                     const { icon, w, h } = scaleBtn;
 
