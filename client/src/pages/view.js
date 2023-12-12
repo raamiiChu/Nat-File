@@ -106,7 +106,7 @@ const View = () => {
 
                     <button
                         type="reset"
-                        className="p-0.5 rounded-full bg-gray-300 hover:bg-black hover:text-primary transition-all duration-300"
+                        className="p-0.5 rounded-full bg-gray bg-opacity-30 hover:bg-black hover:text-primary transition-all duration-300"
                     >
                         Reset
                     </button>
