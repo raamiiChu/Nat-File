@@ -22,6 +22,7 @@ const corsOptions = {
         "http://localhost:3000",
         "http://localhost:3001",
         "https://ec2-52-192-99-138.ap-northeast-1.compute.amazonaws.com",
+        "https://master.d5yayrbyrjfrd.amplifyapp.com",
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: ["Content-Type", "Authorization"],
