@@ -43,7 +43,7 @@ const UploadImage = () => {
 
     // form data
     const [title, setTitle] = useState("");
-    const [species, setSpecies] = useState("未知");
+    const [species, setSpecies] = useState("");
     const [file, setFile] = useState("");
     const [time, setTime] = useState("");
     const [aperture, setAperture] = useState("");
@@ -220,16 +220,13 @@ const UploadImage = () => {
                             name="species"
                             id="species"
                             className="form-input p-1 w-1/2 border border-black rounded-md"
-                            defaultValue={"未知"}
+                            defaultValue={""}
                             required
                             onChange={(e) => {
                                 setSpecies(e.target.value);
                             }}
                         >
-                            <option value="大分類" disabled>
-                                大分類
-                            </option>
-                            <hr disabled />
+                            <option value="" disabled></option>
                             <option value="未知">未知</option>
                             <option value="原生動物">原生動物</option>
                             <option value="真菌">真菌</option>

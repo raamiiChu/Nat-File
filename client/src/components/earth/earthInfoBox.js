@@ -13,7 +13,7 @@ const EarthInfoBox = ({ name, preferredCommonName, user, url, mainImage }) => {
                     <img
                         src={mainImage}
                         alt="test"
-                        className="h-full max-w-full object-contain m-auto rounded-xl bg-black bg-opacity-10 overflow-hidden hover:scale-95 transition-all duration-300"
+                        className="h-full w-full object-center object-cover m-auto rounded-xl bg-black bg-opacity-10 overflow-hidden hover:scale-95 transition-all duration-300"
                     />
                 </div>
             </a>
