@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setPortfolioId } from "../features/portfolioSlice";
 
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import Swal from "sweetalert2";
 
-import { CreateNewPortfolio, PortfolioItem } from "../components/profile";
+import {
+    CreateNewPortfolio,
+    PortfolioItem,
+    Skeleton,
+} from "../components/profile";
 
 const Toast = Swal.mixin({
     toast: true,
@@ -28,8 +33,6 @@ const Profile = () => {
 
     const { backendUrl } = useSelector((state) => state.urlSlice);
     const { userId } = useSelector((state) => state.userSlice);
-
-    const [portfolios, setPortfolios] = useState([]);
 
     const checkUser = async () => {
         const token = localStorage.getItem("token");
@@ -53,12 +56,24 @@ const Profile = () => {
 
             if (status === 200) {
                 const { Portfolios: portfolios } = data;
-                setPortfolios(portfolios);
+                return portfolios;
             }
         } catch (error) {
             console.log(error);
         }
     };
+
+    const {
+        data: portfolios,
+        isLoading,
+        isSuccess,
+        refetch,
+        isFetching,
+    } = useQuery({
+        queryFn: getAllPortfolio,
+        queryKey: ["getAllPortfolio"],
+        staleTime: Infinity,
+    });
 
     const toEditPage = (e, portfolioId) => {
         e.preventDefault();
@@ -93,11 +108,7 @@ const Profile = () => {
                     await axios.delete(`${backendUrl}/images/${s3Key}`);
                 }
 
-                setPortfolios(
-                    portfolios.filter((portfolio) => {
-                        return portfolio.id !== portfolioId;
-                    })
-                );
+                refetch();
 
                 Toast.fire({
                     icon: "success",
@@ -111,23 +122,29 @@ const Profile = () => {
 
     useEffect(() => {
         checkUser();
-        getAllPortfolio();
+        refetch();
     }, []);
 
     return (
-        <main className="grid grid-col-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 px-6 pt-32 pb-16 bg-black lg:px-12 sm:px-16">
+        <main className="grid grid-col-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 px-6 pt-24 pb-16 bg-black lg:px-12 sm:px-16">
             <CreateNewPortfolio toEditPage={toEditPage} />
 
-            {portfolios?.map((portfolio) => {
-                return (
-                    <PortfolioItem
-                        userId={userId}
-                        portfolio={portfolio}
-                        toEditPage={toEditPage}
-                        deletePortfolio={deletePortfolio}
-                    />
-                );
-            })}
+            {(isLoading || isFetching) &&
+                [1, 2, 3, 4, 5, 6, 7, 8].map((index) => {
+                    return <Skeleton key={index} />;
+                })}
+
+            {isSuccess &&
+                portfolios?.map((portfolio) => {
+                    return (
+                        <PortfolioItem
+                            userId={userId}
+                            portfolio={portfolio}
+                            toEditPage={toEditPage}
+                            deletePortfolio={deletePortfolio}
+                        />
+                    );
+                })}
         </main>
     );
 };
