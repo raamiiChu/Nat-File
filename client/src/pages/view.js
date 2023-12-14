@@ -1,18 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import ReactDOM from "react-dom";
+
 import Globe from "react-globe.gl";
 
 import { EarthInfoBox } from "../components/earth";
+import { Panel } from "../components/view";
 
 import axios from "axios";
 
 import Swal from "sweetalert2";
 
+const iNatApiUrl =
+    "https://api.inaturalist.org/v1/observations?geo=true&photos=true&sounds=false&licensed=true&photo_licensed=true&license=cc-by-nc&photo_license=cc-by-nc&order=desc&order_by=created_at";
+
 const View = () => {
     const globeDiv = useRef(null);
+    const [width, setWidth] = useState(window.innerWidth);
+    const [height, setHeight] = useState(700);
 
+    const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(100);
-    const [locationData, setLocationData] = useState([]);
+    const [taxonName, setTaxonName] = useState("");
+    const [userId, setUserId] = useState("");
 
     const getNatData = async () => {
         Swal.fire({
@@ -28,7 +38,7 @@ const View = () => {
 
         try {
             const { status, data } = await axios.get(
-                `https://api.inaturalist.org/v1/observations?photos=true&sounds=false&licensed=true&photo_licensed=true&license=cc-by-nc&photo_license=cc-by-nc&per_page=${perPage}&order=desc&order_by=created_at`
+                `${iNatApiUrl}&user_id=${userId}&taxon_name=${taxonName}&page=${page}&per_page=${perPage}`
             );
 
             if (status === 200) {
@@ -62,74 +72,60 @@ const View = () => {
                         });
                     } catch (error) {}
                 }
-                console.log(locations);
-                setLocationData(locations);
-            }
-        } catch (error) {}
 
-        Swal.close();
+                Swal.close();
+                return locations;
+            }
+        } catch (error) {
+            Swal.close();
+        }
+    };
+
+    const { data: locations, refetch } = useQuery({
+        queryFn: getNatData,
+        queryKey: ["iNatData"],
+        staleTime: Infinity,
+    });
+
+    const handleResize = () => {
+        const newWidth = globeDiv.current?.offsetWidth;
+        const newHeight = globeDiv.current?.offsetHeight;
+        setWidth(newWidth);
+        setHeight(newHeight);
     };
 
     useEffect(() => {
-        getNatData();
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
 
     return (
-        <main className="group grid grid-cols-12 pt-16">
-            <form
-                className="group-hover:opacity-100 opacity-0 fixed w-[30%] bottom-7 left-5 z-30 grid grid-cols-12 p-3 bg-white border border-solid border-black rounded-xl transition-all duration-300"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    getNatData();
-                }}
-            >
-                <div className="col-start-4 col-span-6 grid grid-cols-2 gap-5 px-4">
-                    <div className="col-span-full flex justify-around">
-                        <label htmlFor="perPage">per page: </label>
-                        <input
-                            type="number"
-                            name="perPage"
-                            id="perPage"
-                            min={1}
-                            max={200}
-                            value={perPage}
-                            className="text-center border border-solid border-black"
-                            onChange={(e) => {
-                                let newPage;
-                                newPage = Math.max(1, e.target.value);
-                                newPage = Math.min(e.target.value, 200);
-
-                                setPerPage(newPage);
-                            }}
-                        />
-                    </div>
-
-                    <button
-                        type="reset"
-                        className="p-0.5 rounded-full bg-gray bg-opacity-30 hover:bg-black hover:text-primary transition-all duration-300"
-                    >
-                        Reset
-                    </button>
-                    <button
-                        type="submit"
-                        className="p-0.5 border-2 border-solid border-black rounded-full hover:bg-black hover:text-primary transition-all duration-300"
-                    >
-                        Submit
-                    </button>
-                </div>
-            </form>
+        <main className="group grid grid-cols-12 pt-16 overflow-hidden">
+            <Panel
+                page={page}
+                setPage={setPage}
+                perPage={perPage}
+                setPerPage={setPerPage}
+                setTaxonName={setTaxonName}
+                setUserId={setUserId}
+                refetch={refetch}
+            />
 
             <div
                 ref={globeDiv}
-                className="col-span-full max-h-[650px] cursor-grab active:cursor-grabbing"
+                className="col-span-full max-h-[95vh] cursor-grab active:cursor-grabbing"
             >
                 <Globe
-                    width={globeDiv.current?.offsetWidth}
-                    height={globeDiv.current?.offsetHeight}
+                    width={width}
+                    height={height}
                     globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
                     bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+                    backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
                     atmosphereAltitude={0.3}
-                    htmlElementsData={locationData}
+                    htmlElementsData={locations}
                     htmlElement={(data) => {
                         const {
                             name,
@@ -144,11 +140,11 @@ const View = () => {
                         const el = document.createElement("div");
 
                         const markerSvg = `
-                    <svg viewBox="-4 0 36 36">
-                        <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
-                        <circle fill="black" cx="14" cy="14" r="7"></circle>
-                    </svg>
-                `;
+                            <svg viewBox="-4 0 36 36">
+                                <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
+                                <circle fill="black" cx="14" cy="14" r="7"></circle>
+                            </svg>
+                        `;
                         el.innerHTML = markerSvg;
                         el.style.color = color;
                         el.style.width = `${size}px`;
@@ -157,6 +153,7 @@ const View = () => {
                         el.style["pointer-events"] = "auto";
                         el.style.cursor = "pointer";
 
+                        console.log(preferredCommonName);
                         el.onmouseenter = () => {
                             const infoBox = document.createElement("div");
                             ReactDOM.render(
