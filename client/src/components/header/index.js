@@ -126,7 +126,7 @@ const Header = () => {
             >
                 {navLinks.map((navLink, index) => {
                     // profile will not shown if user not sign in
-                    if (!isAuth && index >= 2) {
+                    if (!isAuth && index >= 1) {
                         return <div key={`mobile-links-${index}`}></div>;
                     }
 
