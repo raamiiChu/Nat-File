@@ -137,3 +137,38 @@ table {
 body {
     font-family: "Noto Sans TC", Arial, Helvetica, sans-serif;
 }
+
+/* disable btn which next to input:number */
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-track-piece {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+
+    background-color: #ffeaa1;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: transparent;
+}
