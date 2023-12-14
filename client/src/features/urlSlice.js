@@ -1,6 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = { backendUrl: "http://localhost:3001" };
+const initialState = {
+    backendUrl:
+        "https://ec2-52-192-99-138.ap-northeast-1.compute.amazonaws.com",
+};
 
 export const urlSlice = createSlice({
     name: "url",
