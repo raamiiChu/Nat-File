@@ -52,6 +52,7 @@
 ## Frontend
 
 - HTML & CSS & JavaScript
+- RWD
 - React & Redux
 
 ## Backend
