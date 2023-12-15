@@ -169,7 +169,6 @@ const Signin = () => {
                             name="email"
                             id="email"
                             required
-                            defaultValue={"jane456@fake.com"}
                             placeholder="email"
                             className="form-input col-start-6 col-span-6 py-1 indent-4 border border-solid border-black rounded-lg focus:outline-none"
                         />
@@ -187,22 +186,15 @@ const Signin = () => {
                             name="password"
                             id="password"
                             required
-                            defaultValue={"123ASDspdo$"}
                             placeholder="password"
                             className="form-input col-start-6 col-span-6 py-1 indent-4 border border-solid border-black rounded-lg focus:outline-none"
-                            onFocus={(e) => {
-                                e.target.type = "text";
-                            }}
-                            onBlur={(e) => {
-                                e.target.type = "password";
-                            }}
                         />
                     </section>
 
                     <div className="grid grid-cols-12 mt-2">
                         <button
                             type="submit"
-                            className="form-input col-start-3 col-span-3 p-1 border-2 border-solid border-black rounded-3xl text-base bg-white text-black hover:bg-black hover:text-primary transition-all duration-300"
+                            className="form-input col-start-3 col-span-3 p-1 rounded-3xl text-base bg-gray bg-opacity-30 hover:bg-black hover:text-primary transition-all duration-300"
                             onClick={(e) => {
                                 setFormAction("Sign Up");
                             }}

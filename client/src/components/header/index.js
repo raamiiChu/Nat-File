@@ -31,9 +31,7 @@ const Header = () => {
 
     const [showMenu, setShowMenu] = useState(false);
     const navLinks = [
-        ["About", "/about"],
         ["View", "/view"],
-        ["Edit", "/edit"],
         ["Profile", "/profile"],
     ];
 
@@ -57,7 +55,7 @@ const Header = () => {
     };
 
     return (
-        <header className="sticky top-0 z-50 w-full grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest shadow-md shadow-black">
+        <header className="fixed w-full top-0 z-50 grid grid-cols-12 items-center px-0 sm:px-4 bg-black text-white text-center tracking-widest border-b-2 border-solid border-white border-opacity-60">
             {/* homepage link */}
             <Link
                 to="/"
@@ -69,16 +67,16 @@ const Header = () => {
             {/* laptop links */}
             <ul className="col-span-6 lg:col-span-4 hidden sm:grid grid-cols-4 items-center text:lg lg:text-xl">
                 {navLinks.map((navLink, index) => {
-                    // edit & profile will not shown if user not sign in
-                    if (!isAuth && index >= 2) {
-                        return <></>;
+                    // profile will not shown if user not sign in
+                    if (!isAuth && index >= 1) {
+                        return <div key={`mobile-links-${index}`}></div>;
                     }
 
                     return (
                         <Link
                             key={`laptop-links-${index}`}
                             to={navLink[1]}
-                            className="hover:opacity-75"
+                            className="relative hover:text-primary after:content-[''] after:absolute after:bottom-1 after:left-0 after:border-primary after:border-b-2 after:w-0 hover:after:w-full after:transition-all after:duration-300"
                         >
                             <li className="block py-3.5">{navLink[0]}</li>
                         </Link>
@@ -89,7 +87,7 @@ const Header = () => {
             {/* switch btn if user sign in or sign out */}
             {!isAuth && (
                 <Link
-                    className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
+                    className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold relative hover:text-primary after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-primary after:border-b-2 after:w-0 hover:after:w-1/2 after:transition-all after:duration-300"
                     onClick={() => {
                         dispatch(setIsSign(!isSign));
                     }}
@@ -99,7 +97,7 @@ const Header = () => {
             )}
             {isAuth && (
                 <Link
-                    className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold hover:opacity-75"
+                    className="col-start-10 xl:col-start-11 col-span-3 xl:col-span-2 hidden sm:grid items-center py-3.5 text-lg lg:text-xl font-bold relative hover:text-primary after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-primary after:border-b-2 after:w-0 hover:after:w-1/2 after:transition-all after:duration-300"
                     onClick={(e) => {
                         signOut(e);
                     }}
@@ -124,25 +122,28 @@ const Header = () => {
                     showMenu
                         ? "grid h-auto opacity-100"
                         : "hidden -h-10 opacity-0"
-                } absolute w-full top-full col-span-full sm:hidden py-1 bg-black bg-opacity-75 text-lg tracking-[0.125rem] shadow-md shadow-black transition-all duration-300 ease-in-out`}
+                } absolute w-full top-full col-span-full sm:hidden py-1 bg-black bg-opacity-90 text-lg tracking-[0.125rem] shadow-md shadow-black transition-all duration-300 ease-in-out`}
             >
                 {navLinks.map((navLink, index) => {
+                    // profile will not shown if user not sign in
+                    if (!isAuth && index >= 1) {
+                        return <div key={`mobile-links-${index}`}></div>;
+                    }
+
                     return (
                         <Link
                             key={`mobile-links-${index}`}
                             to={navLink[1]}
-                            className="hover:opacity-75"
+                            className=" relative hover:text-primary after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-primary after:border-b-2 after:w-0 hover:after:w-1/2 after:transition-all after:duration-300"
                         >
-                            <li className="py-2.5" key={index}>
-                                {navLink[0]}
-                            </li>
+                            <li className="py-2.5">{navLink[0]}</li>
                         </Link>
                     );
                 })}
 
                 {!isAuth && (
                     <Link
-                        className="py-2.5 hover:opacity-75"
+                        className="py-2.5  relative hover:text-primary after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-primary after:border-b-2 after:w-0 hover:after:w-1/2 after:transition-all after:duration-300"
                         onClick={() => {
                             dispatch(setIsSign(!isSign));
                         }}
@@ -152,7 +153,7 @@ const Header = () => {
                 )}
                 {isAuth && (
                     <Link
-                        className="py-2.5 hover:opacity-75"
+                        className="py-2.5  relative hover:text-primary after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:border-primary after:border-b-2 after:w-0 hover:after:w-1/2 after:transition-all after:duration-300"
                         onClick={(e) => {
                             signOut(e);
                         }}

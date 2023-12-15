@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 
-import { ChartContainer, Board, UploadImage } from "../components/edit";
+import { Board, UploadImage } from "../components/edit";
+import { ChartContainer } from "../components/chart";
 
 import axios from "axios";
 
@@ -30,7 +31,7 @@ const Edit = () => {
     }, []);
 
     return (
-        <main className="relative bg-[url('../images/edit-bg.jpg')] bg-cover bg-no-repeat bg-top">
+        <main className="pt-16 relative bg-fixed bg-[url('../images/edit-bg.jpg')] bg-cover bg-no-repeat bg-top">
             <Board />
 
             <UploadImage />

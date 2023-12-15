@@ -1,173 +1,184 @@
-import React, { useState, useEffect } from "react";
-import gsap from "gsap";
+import React, { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import ReactDOM from "react-dom";
 
-import * as THREE from "three";
-import earthMap from "../images/earth.jpg";
+import Globe from "react-globe.gl";
 
-const vertexShader = `
-varying vec2 vertexUV;
-varying vec3 vertexNormal;
+import { EarthInfoBox } from "../components/earth";
+import { Panel } from "../components/view";
 
-void main() {
-    vertexUV = uv;
-    vertexNormal = normalize(normalMatrix * normal);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
+import axios from "axios";
 
-const fragmentShader = `
-uniform sampler2D earthTexture;
+import Swal from "sweetalert2";
 
-varying vec2 vertexUV;
-varying vec3 vertexNormal;
-
-void main() {
-    float intensity = 1.05 - dot(vertexNormal, vec3(0.0, 0.0, 1.0));
-    vec3 atmosphere = vec3(0.3, 0.6, 1) * pow(intensity, 1.0);
-
-    gl_FragColor = vec4(atmosphere + texture2D(earthTexture, vertexUV).xyz, 1);
-}
-`;
-
-const atmosphereVertexShader = `
-varying vec3 atmosphereVertexNormal;
-
-void main() {
-    atmosphereVertexNormal = normalize(normalMatrix * normal);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.9);
-}
-`;
-
-const atmosphereFragmentShader = `
-varying vec3 atmosphereVertexNormal;
-
-void main() {
-    float intensity = pow(0.15 - dot(atmosphereVertexNormal, vec3(0, 0, 1.0)) - 0.1, 2.0);
-
-    gl_FragColor = vec4(0.3, 0.6, 1.0, 0.35) * intensity;
-}
-`;
+const iNatApiUrl =
+    "https://api.inaturalist.org/v1/observations?geo=true&photos=true&sounds=false&licensed=true&photo_licensed=true&license=cc-by-nc&photo_license=cc-by-nc&order=desc&order_by=created_at";
 
 const View = () => {
-    // const handleMouse = (e) => {
-    //     setMouseX((e.clientX / window.innerWidth) * 2 - 1);
-    //     setMouseY((e.clientY / window.innerHeight) * 2 - 1);
+    const globeDiv = useRef(null);
+    const [width, setWidth] = useState(window.innerWidth);
+    const [height, setHeight] = useState(700);
 
-    //     mouse.x = (e.clientX / width) * 2 - 1;
-    //     mouse.y = (e.clientY / height) * 2 - 1;
-    // };
-    // const [mouseX, setMouseX] = useState(null);
-    // const [mouseY, setMouseY] = useState(null);
+    const [page, setPage] = useState(1);
+    const [perPage, setPerPage] = useState(100);
+    const [taxonName, setTaxonName] = useState("");
+    const [userId, setUserId] = useState("");
 
-    useEffect(() => {
-        const width = 1080;
-        const height = 720;
+    const getNatData = async () => {
+        Swal.fire({
+            icon: "info",
+            title: "Fetching Data Now",
+            text: "Please wait...",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            70,
-            width / height,
-            0.01,
-            10
-        );
+        try {
+            const { status, data } = await axios.get(
+                `${iNatApiUrl}&user_id=${userId}&taxon_name=${taxonName}&page=${page}&per_page=${perPage}`
+            );
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(window.devicePixelRatio);
+            if (status === 200) {
+                const locations = [];
+                const { results } = data;
 
-        const earthDiv = document.getElementById("earth");
-        earthDiv.appendChild(renderer.domElement);
+                for (const result of results) {
+                    try {
+                        const { uri, user, taxon, observation_photos } = result;
 
-        // create a earth
-        const earth = new THREE.Mesh(
-            new THREE.SphereGeometry(5, 50, 50),
-            new THREE.ShaderMaterial({
-                vertexShader,
-                fragmentShader,
-                uniforms: {
-                    earthTexture: {
-                        value: new THREE.TextureLoader().load(earthMap),
-                    },
-                },
-            })
-        );
+                        const { coordinates } = result.geojson;
+                        const { name, preferred_common_name } = taxon;
+                        const mainImage =
+                            observation_photos[0].photo.url.replace(
+                                "square",
+                                "medium"
+                            );
 
-        scene.add(earth);
+                        locations.push({
+                            name,
+                            preferredCommonName: preferred_common_name,
+                            user: user.login,
+                            lat: coordinates[1],
+                            lng: coordinates[0],
+                            size: 30,
+                            color: ["red", "white", "blue", "green"][
+                                Math.round(Math.random() * 3)
+                            ],
+                            url: uri,
+                            mainImage,
+                        });
+                    } catch (error) {}
+                }
 
-        // create atmosphere
-        const atmosphere = new THREE.Mesh(
-            new THREE.SphereGeometry(5, 50, 50),
-            new THREE.ShaderMaterial({
-                vertexShader: atmosphereVertexShader,
-                fragmentShader: atmosphereFragmentShader,
-                blending: THREE.AdditiveBlending,
-            })
-        );
-
-        atmosphere.scale.set(1.15, 1.15, 1.15);
-
-        scene.add(atmosphere);
-
-        const group = new THREE.Group();
-        group.add(earth);
-        scene.add(group);
-
-        const starGeometry = new THREE.BufferGeometry();
-        const starMaterial = new THREE.PointsMaterial({ color: "#FFFFFF" });
-
-        const starVertices = [];
-        for (let i = 0; i < 10000; i++) {
-            const x = (Math.random() - 0.5) * 2000;
-            const y = (Math.random() - 0.5) * 2000;
-            const z = -Math.random() * 1000;
-
-            starVertices.push(x, y, z);
+                Swal.close();
+                return locations;
+            }
+        } catch (error) {
+            Swal.close();
         }
+    };
 
-        starGeometry.setAttribute(
-            "position",
-            new THREE.Float32BufferAttribute(starVertices, 3)
-        );
-
-        const stars = new THREE.Points(starGeometry, starMaterial);
-
-        scene.add(stars);
-
-        // reset position of camera
-        // make sure the value should greater than 1st param of THREE.SphereGeometry()
-        camera.position.z = 12;
-        const mouse = { x: null, y: null };
-
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-            earth.rotation.y += 0.001;
-
-            gsap.to(group.rotation, {
-                x: mouse.y * 0.5,
-                y: mouse.x * 0.5,
-                duration: 1.2,
-            });
-        }
-
-        animate();
-
-        const handleMouse = (e) => {
-            // setMouseX((e.clientX / width) * 2 - 1);
-            // setMouseY((e.clientY / height) * 2 - 1);
-
-            mouse.x = (e.clientX / width) * 2 - 1;
-            mouse.y = (e.clientY / height) * 2 - 1;
-        };
-
-        earthDiv.addEventListener("mousemove", handleMouse);
-
-        return () => {
-            earthDiv.removeEventListener("mousemove", handleMouse);
-        };
+    const { data: locations, refetch } = useQuery({
+        queryFn: getNatData,
+        queryKey: ["iNatData"],
+        staleTime: Infinity,
     });
 
-    return <div id="earth"></div>;
+    const handleResize = () => {
+        const newWidth = globeDiv.current?.offsetWidth;
+        const newHeight = globeDiv.current?.offsetHeight;
+        setWidth(newWidth);
+        setHeight(newHeight);
+    };
+
+    useEffect(() => {
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    return (
+        <main className="group grid grid-cols-12 pt-16 overflow-hidden">
+            <Panel
+                page={page}
+                setPage={setPage}
+                perPage={perPage}
+                setPerPage={setPerPage}
+                setTaxonName={setTaxonName}
+                setUserId={setUserId}
+                refetch={refetch}
+            />
+
+            <div
+                ref={globeDiv}
+                className="col-span-full max-h-[95vh] cursor-grab active:cursor-grabbing"
+            >
+                <Globe
+                    width={width}
+                    height={height}
+                    globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+                    bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+                    backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+                    atmosphereAltitude={0.3}
+                    htmlElementsData={locations}
+                    htmlElement={(data) => {
+                        const {
+                            name,
+                            preferredCommonName,
+                            user,
+                            color,
+                            size,
+                            url,
+                            mainImage,
+                        } = data;
+
+                        const el = document.createElement("div");
+
+                        const markerSvg = `
+                            <svg viewBox="-4 0 36 36">
+                                <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
+                                <circle fill="black" cx="14" cy="14" r="7"></circle>
+                            </svg>
+                        `;
+                        el.innerHTML = markerSvg;
+                        el.style.color = color;
+                        el.style.width = `${size}px`;
+                        el.style.position = "relative";
+
+                        el.style["pointer-events"] = "auto";
+                        el.style.cursor = "pointer";
+
+                        console.log(preferredCommonName);
+                        el.onmouseenter = () => {
+                            const infoBox = document.createElement("div");
+                            ReactDOM.render(
+                                <EarthInfoBox
+                                    name={name}
+                                    preferredCommonName={preferredCommonName}
+                                    user={user}
+                                    url={url}
+                                    mainImage={mainImage}
+                                />,
+                                infoBox
+                            );
+                            el.appendChild(infoBox);
+                        };
+
+                        el.onmouseleave = () => {
+                            el.removeChild(el.lastChild);
+                        };
+
+                        return el;
+                    }}
+                />
+            </div>
+        </main>
+    );
 };
 
 export default View;

@@ -1,9 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { portfolioSlice, triggerSlice, urlSlice, userSlice } from "../features";
+import {
+    portfolioSlice,
+    triggerSlice,
+    urlSlice,
+    userSlice,
+    shareSlice,
+} from "../features";
 
 const store = configureStore({
-    reducer: { portfolioSlice, triggerSlice, urlSlice, userSlice },
+    reducer: { portfolioSlice, triggerSlice, urlSlice, userSlice, shareSlice },
 });
 
 export default store;

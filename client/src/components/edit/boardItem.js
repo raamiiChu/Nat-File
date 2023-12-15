@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLayouts, setImages } from "../../features/portfolioSlice";
 
 import axios from "axios";
+import { format } from "date-fns";
 
 import Swal from "sweetalert2";
 
@@ -34,7 +35,7 @@ const Toast = Swal.mixin({
 });
 
 const BoardItem = ({ image }) => {
-    const { id, title, species, time, s3Key } = image;
+    const { id, title, species, time, aperture, shutter, iso, s3Key } = image;
 
     // reducer
     const dispatch = useDispatch();
@@ -52,7 +53,7 @@ const BoardItem = ({ image }) => {
         e.stopPropagation();
         e.preventDefault();
 
-        Swal.fire({
+        const result = await Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
@@ -60,24 +61,24 @@ const BoardItem = ({ image }) => {
             showCancelButton: true,
             showDenyButton: true,
             denyButtonText: "Delete",
-        }).then(async (result) => {
-            if (result.isDenied) {
-                await axios.delete(`${backendUrl}/images/${s3Key}`);
-
-                Toast.fire({
-                    icon: "success",
-                    title: "Your image has been deleted",
-                });
-
-                dispatch(
-                    setImages(
-                        images.filter((image) => {
-                            return image.id !== id;
-                        })
-                    )
-                );
-            }
         });
+
+        if (result.isDenied) {
+            await axios.delete(`${backendUrl}/images/${s3Key}`);
+
+            Toast.fire({
+                icon: "success",
+                title: "Your image has been deleted",
+            });
+
+            dispatch(
+                setImages(
+                    images.filter((image) => {
+                        return image.id !== id;
+                    })
+                )
+            );
+        }
     };
 
     // trigger by scale btns
@@ -111,7 +112,7 @@ const BoardItem = ({ image }) => {
             return 0;
         }
 
-        const foundLayout = layouts["lg"].filter((layout) => {
+        const foundLayout = layouts["lg"]?.filter((layout) => {
             return layout.i === id;
         });
 
@@ -151,10 +152,24 @@ const BoardItem = ({ image }) => {
                 />
             </div>
             <article>
-                <h2>Name: {title}</h2>
-                <p>Time: {time}</p>
-                <h3>Species: {species}</h3>
+                <h2>{title}</h2>
+                <p>{format(new Date(time), "yyyy / hh / mm")}</p>
+                <h3>{species}</h3>
             </article>
+
+            <hr />
+
+            <ul className="grid gap-y-1 text-sm">
+                <li>
+                    光圈 <br /> {aperture}
+                </li>
+                <li>
+                    快門 <br /> 1/{shutter}
+                </li>
+                <li>
+                    ISO <br /> {iso}
+                </li>
+            </ul>
 
             <button
                 className="absolute z-10 -left-5 -top-5 w-10 h-10 border border-solid border-black border-opacity-30 rounded-full shadow-2xl bg-white text-black opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
@@ -165,7 +180,7 @@ const BoardItem = ({ image }) => {
                 <FaRegTrashAlt className="mx-auto" />
             </button>
 
-            <nav className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-x-2 px-4 py-1.5 rounded-lg bg-black bg-opacity-50 text-white transition-all hover:opacity-100 cursor-default">
+            <nav className="opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-x-2 px-4 py-1.5 rounded-lg bg-black bg-opacity-60 text-white transition-all hover:opacity-100 cursor-default">
                 {scaleBtns.map((scaleBtn, index) => {
                     const { icon, w, h } = scaleBtn;
 

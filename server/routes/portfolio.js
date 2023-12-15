@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { User, Portfolio } from "../models/index.js";
+import { v4 as uuidv4 } from "uuid";
+
 const route = Router();
 
 route.use((req, res, next) => {
@@ -27,6 +29,7 @@ route.post("/load", async (req, res) => {
         if (!id) {
             const foundUser = await User.findOne({ where: { email } });
             const newPortfolio = await Portfolio.create({
+                publicId: uuidv4(),
                 images: [],
                 layouts: {
                     lg: [],
@@ -62,6 +65,24 @@ route.get("/loadAll/:id", async (req, res) => {
             attributes: ["email"],
             include: [{ model: Portfolio }],
         });
+
+        return res.status(200).send(rawData);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+});
+
+// get portfolio by public id
+route.get("/share/:publicId", async (req, res) => {
+    const { publicId } = req.params;
+    try {
+        const rawData = await Portfolio.findOne({
+            where: { publicId },
+        });
+
+        if (!rawData) {
+            return res.status(404).send("No Found");
+        }
 
         return res.status(200).send(rawData);
     } catch (error) {
