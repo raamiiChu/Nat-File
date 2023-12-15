@@ -82,7 +82,7 @@
 - [gsap](https://gsap.com/)
 
 ### Functionality
-- {date-fns](https://date-fns.org/)
+- [date-fns](https://date-fns.org/)
 - [exif-js](https://github.com/exif-js/exif-js)
 - [react-globe.gl](https://github.com/vasturiano/react-globe.gl)
 - [react-grid-layout](https://github.com/react-grid-layout/react-grid-layout)
