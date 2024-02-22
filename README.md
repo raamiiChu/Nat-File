@@ -11,6 +11,13 @@
 
 - Portfolio Example: https://master.d5yayrbyrjfrd.amplifyapp.com/share/85f8ce9b-99d3-4c0b-b1c0-ce9d9d853cfe
 
+- Fake User Info For Testing:
+  ```
+  email: tom@fake.com
+  password: 123456
+  ```
+  
+
 ---  
 
 # Feature
