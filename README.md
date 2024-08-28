@@ -7,16 +7,9 @@
 
 - Author: Ramy Chu  
 
-- Web Page: https://master.d5yayrbyrjfrd.amplifyapp.com/  
+- This is a personal project for practicing full-stack development; it has **No Commercial Use**.
 
-- Portfolio Example: https://master.d5yayrbyrjfrd.amplifyapp.com/share/85f8ce9b-99d3-4c0b-b1c0-ce9d9d853cfe
-
-- Fake User Info For Testing:
-  ```
-  email: tom@fake.com
-  password: 123456
-  ```
-  
+- The project is not deployed due to the 1-year AWS free tier limit being reached.
 
 ---  
 
@@ -41,7 +34,7 @@ https://github.com/raamiiChu/Nat-File/assets/87169493/5c84f3af-b4db-45fe-95c5-99
 
 ## Edit Your Portfolio
 
-**Upload your photos, drag and zoom to edit your own personal portfolio.**
+**Upload your photos, drag and zoom to edit your portfolio.**
 
 ![Upload Image](https://github.com/raamiiChu/Nat-File/assets/87169493/93f4094c-f3af-4f69-bdfa-394abfcc64fe)
 
@@ -52,7 +45,7 @@ https://github.com/raamiiChu/Nat-File/assets/87169493/5c84f3af-b4db-45fe-95c5-99
 
 ## Share To Others
 
-**Share your portfolio via public link and view details and statistics of photos.**
+**Share your portfolio via the public link and view details and statistics of photos.**
 
 ![Share to Others](https://github.com/raamiiChu/Nat-File/assets/87169493/e6378eb4-62fe-4b9f-96c5-5e9ece3e73d4)
 
@@ -135,10 +128,4 @@ https://github.com/raamiiChu/Nat-File/assets/87169493/5c84f3af-b4db-45fe-95c5-99
 - [passport-jwt](https://www.passportjs.org/packages/passport-jwt/)
 
 ---
-
-# Warning
-
-- This is a personal project for practicing full-stack development; it has **No Commercial Use**.
-
-- The link will be unavailable if the 1-year AWS free tier limit is reached.
  
