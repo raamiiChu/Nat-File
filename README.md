@@ -5,7 +5,9 @@
 
 # Basic Info
 
-- Author: Ramy Chu  
+- Author: Ramy Chu
+
+- Wireframes: [Figma](https://www.figma.com/design/QKoVq844yEYsknUaauFO4h/Nat-File-Proposal?node-id=0-1&t=OP221LlvDDlitbcf-1)
 
 - This is a personal project for practicing full-stack development; it has **No Commercial Use**.
 
